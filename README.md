@@ -26,13 +26,17 @@ python3 -m venv python-env
 After you have done setting up the virtual environment, activate it and install the required dependecies
 For macOS:
 ```
-source app/python-env/bin/activate
-pip install app/requirements.txt
+source python-env/bin/activate
+cd app
+pip install requirements.txt
+```
+if pip install fails, use:
+```
+pip install --upgrade -r requirements.txt
 ```
 
 ### Run database installer
 ```
-cd app
 python3 create_db.py
 ```
 
