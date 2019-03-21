@@ -40,3 +40,12 @@ pip install --upgrade -r requirements.txt
 python3 create_db.py
 ```
 
+### Starting the application
+Depending on your preferences, there are many ways to start the app. But do rember to **RENAME .env.example to .env AND SET THE VARIABLES INSIDE ACCORDING TO YOUR CONFIGURATION**. These configurations will auto be loaded to the environment by flask.
+
+Ensure you are in your virtual environment
+
+Starting the app:
+```
+flask run
+```
