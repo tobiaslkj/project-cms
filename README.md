@@ -28,7 +28,7 @@ For macOS:
 ```
 source python-env/bin/activate
 (venv) cd app
-(venv) pip install requirements.txt
+(venv) pip install -r requirements.txt
 ```
 if pip install fails, use:
 ```
