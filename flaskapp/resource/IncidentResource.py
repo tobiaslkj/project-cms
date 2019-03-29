@@ -15,7 +15,8 @@ class IncidentResource(Resource):
         parser.add_argument('assignedBy', help='This field cannot be blank', required = True)
         parser.add_argument('gpIC', help='This field cannot be blank', required = True)
         parser.add_argument('emerType', help='This field cannot be blank', required = True)
-
+        data = parser.parse_args()
+        
         # Create the user instance and add to db
         incident =Incident(address=data['address'], postalCode=data['postalCode'], longtitude=data['longtitude'], latitude=data['latitude'], assignedBy=data['assignedBy'], gpIC=data['gpIC'], emerType=data['emerType'])
         db.session.add(incident)
