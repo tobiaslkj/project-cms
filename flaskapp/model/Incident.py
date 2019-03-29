@@ -12,13 +12,21 @@ class EmergencyType(db.Model):
     def __init__(self, **kwargs):
         super(EmergencyType, self).__init__(**kwargs)
 
+#request M2M relationship table
+request_table = db.Table('request_table',
+    db.Column('aid', db.Integer, db.ForeignKey('AssistanceType.aid')),
+    db.Column('incidentID', db.Integer, db.ForeignKey('Incident.incidentID'))
+)
 
 # #M2M with incident
-# class AssistanceType(db.Model):
-#     __tablename__ = 'AssistanceType'
-#     aid = db.Column(db.Integer, primary_key=True)
-#     def __init__(self, assistType):
-#         super(AssistanceType, self).__init__(assistType)
+class AssistanceType(db.Model):
+    __tablename__ = 'AssistanceType'
+    aid = db.Column(db.Integer, primary_key=True)
+    assistanceName = db.Column(db.String(30),unique=True, nullable=False)
+    requestAssociation = db.relationship('Incident', secondary=request_table, backref=db.backref('assist', lazy='dynamic'))
+  
+    def __init__(self, assistType):
+        super(AssistanceType, self).__init__(assistType)
 
 
 class GeneralPublic(db.Model):
