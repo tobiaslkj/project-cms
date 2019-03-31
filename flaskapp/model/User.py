@@ -1,7 +1,8 @@
 from flaskapp import db
 import bcrypt
 class User(db.Model): #all table need to extend db.Model
-    id = db.Column(db.Integer, primary_key=True)
+    __tablename__='user'
+    uid = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), unique=False, nullable=False)  #nullable = cannot be null
     userIC = db.Column(db.String(9), unique=True, nullable=False)
     mobilePhone = db.Column(db.String(8), unique=True, nullable=False)

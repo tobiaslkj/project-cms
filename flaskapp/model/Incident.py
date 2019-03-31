@@ -1,6 +1,7 @@
 from flaskapp import db
 from sqlalchemy.orm import relationship
 from datetime import datetime
+from flaskapp.model.User import User
 
 #For a time being putting all inside the same file first - seperate the class later
 
@@ -41,14 +42,26 @@ class GeneralPublic(db.Model):
     def __init__(self, **kwargs):
         super(GeneralPublic, self).__init__(**kwargs)
 
-# #M2M with incident
-# class RelevantAgencies(db.Model):
-#     _tablename_ = 'RelevantAgencies'
-#     agencyid = db.Column(db.Integer, primary_key=True)
-#     agencyName = db.Column(db.String(50), unique=False, nullable=False)
 
-#     def __init__(self, **kwargs):
-#         super(RelevantAgencies, self).__init__(**kwargs)
+#assign_to M2M relationship table
+assign_to = db.Table('assign_to',
+    db.Column('agencyid', db.Integer, db.ForeignKey('relevant_agencies.agencyid')),
+    db.Column('incidentID', db.Integer, db.ForeignKey('incident.incidentID')),
+    db.Column('link', db.String(255)),
+    db.Column('ackTimeStamp', db.DateTime)
+    )
+   
+
+#M2M with incident
+class RelevantAgencies(db.Model):
+    _tablename_ = 'relevant_agencies'
+    agencyid = db.Column(db.Integer, primary_key=True)
+    agencyName = db.Column(db.String(50), unique=False, nullable=False)
+    agencyNumber = db.Column(db.Integer, unique=True, nullable=False)
+    assignAssociation = db.relationship('Incident', secondary=assign_to, backref=db.backref('agency', lazy='dynamic'))
+
+    def __init__(self, **kwargs):
+        super(RelevantAgencies, self).__init__(**kwargs)
 
 
 class Incident(db.Model):
@@ -68,7 +81,25 @@ class Incident(db.Model):
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
     timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+
     def __init__(self, **kwargs):
         super(Incident, self).__init__(**kwargs)
 
+class Status(db.Model):
+    __tablename__= 'status'
+    statusID = db.Column(db.Integer, primary_key=True)
+    statusName = db.Column(db.String(20), nullable=False)
+
+    def __init__(self, **kwargs):
+        super(Status, self).__init__(**kwargs)
+
+class IncidentHasStatus(db.Model):
+    __tablename__ = 'incident_has_status'
+    statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
+    statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
+    incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
+    uid = db.Column(db.Integer, db.ForeignKey('user.uid'))
+
+    def __init__(self, **kwargs):
+        super(IncidentHasStatus, self).__init__(**kwargs)
 
