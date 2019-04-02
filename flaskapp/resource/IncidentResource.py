@@ -11,13 +11,10 @@ class IncidentResource(Resource):
 
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
-        #dataArray=request.get_json()
         parser.add_argument('address', help='Address field cannot be blank', required = True)
         parser.add_argument('postalCode', help='Postal Code field cannot be blank', required = True)
         parser.add_argument('longtitude', help='This field cannot be blank', required = True)
         parser.add_argument('latitude', help='This field cannot be blank', required = True)
-        #parser.add_argument('assignedBy', help='This field cannot be blank', required = True)
-        #parser.add_argument('eid', help='This field cannot be blank', required = True)
         parser.add_argument('name', help='name cannot be blank',required=True)
         parser.add_argument('userIC', help='userIC cannot be blank',required=True)
         parser.add_argument('mobilePhone', help='mobilePhone cannot be blank', required=True)
@@ -41,19 +38,21 @@ class IncidentResource(Resource):
         db.session.add(incident)
         db.session.commit()
 
-
+        #update incident_request_assistanceType table
         for x in data['assistance_type']:
             aid = AssistanceType.query.filter_by(aid=x).first()
             incident.assist.append(aid)
             db.session.add(incident)
             db.session.commit()
-            
+
+        #update incident_has_emergencyType table  
         for y in data['emergency_type']:
             eid = EmergencyType.query.filter_by(eid=y).first()
             incident.emergency.append(eid)
             db.session.add(incident)
             db.session.commit()
-            
+
+        #update incident_assign_to_relevantAgencies table    
         for z in data['relevant_agencies']:
             agencyid = RelevantAgencies.query.filter_by(agencyid=z).first()
             incident.agency.append(agencyid)
