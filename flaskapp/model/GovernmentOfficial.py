@@ -15,7 +15,7 @@ class GovernmentOfficial(User):
     #Overriding the db.Model constructor
     
     
-    governmentid = db.Column(db.Integer, ForeignKey('user.userid'), primary_key=True)
+    governmentid = db.Column(db.Integer, ForeignKey('user.uid'), primary_key=True)
 
     def getClaimsOfUser(self):
         return{

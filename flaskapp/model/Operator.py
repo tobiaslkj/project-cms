@@ -15,7 +15,7 @@ class Operator(User):
     #Overriding the db.Model constructor
     
     
-    operatorid = db.Column(db.Integer, ForeignKey('user.userid'), primary_key=True)
+    operatorid = db.Column(db.Integer, ForeignKey('user.uid'), primary_key=True)
 
     def getClaimsOfUser(self):
         return{
