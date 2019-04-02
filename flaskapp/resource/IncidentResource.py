@@ -51,7 +51,7 @@ class IncidentResource(Resource):
 
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 
-                            latitude=latitude, assignedBy=data['assignedBy'], gpid=gpid, eid=data['eid'])
+                            latitude=latitude, gpid=gpid)
         db.session.add(incident)
         db.session.commit()
 
