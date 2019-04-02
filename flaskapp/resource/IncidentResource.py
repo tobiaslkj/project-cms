@@ -13,8 +13,6 @@ class IncidentResource(Resource):
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('address', help='Address field cannot be blank', required = True)
         parser.add_argument('postalCode', help='Postal Code field cannot be blank', required = True)
-        parser.add_argument('longtitude', help='This field cannot be blank', required = True)
-        parser.add_argument('latitude', help='This field cannot be blank', required = True)
         parser.add_argument('name', help='name cannot be blank',required=True)
         parser.add_argument('userIC', help='userIC cannot be blank',required=True)
         parser.add_argument('mobilePhone', help='mobilePhone cannot be blank', required=True)
@@ -33,8 +31,7 @@ class IncidentResource(Resource):
         gpid = gp.gpid
 
         # Create the incident instance and add to db
-        incident =Incident(address=data['address'], postalCode=data['postalCode'], longtitude=data['longtitude'], 
-                            latitude=data['latitude'], gpid=gpid)
+        incident =Incident(address=data['address'], postalCode=data['postalCode'], gpid=gpid)
         db.session.add(incident)
         db.session.commit()
 

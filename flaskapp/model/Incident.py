@@ -80,6 +80,7 @@ class Incident(db.Model):
     #Will be computed based by postalCode
     longtitude = db.Column(db.String(120), unique=False, nullable=False)
     latitude = db.Column(db.String(120), unique=False, nullable=False)
+    
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
     timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
