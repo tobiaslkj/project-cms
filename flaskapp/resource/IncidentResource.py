@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
 from flaskapp import db
-from flaskapp.model.Incident import Incident
+from flask import Flask, request, json, jsonify
+from flaskapp.model.Incident import *
 from flaskapp.model.Incident import GeneralPublic
 from datetime import datetime
 import requests, json
@@ -12,11 +13,12 @@ class IncidentResource(Resource):
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('address', help='Address field cannot be blank', required = True)
-        parser.add_argument('assignedBy', help='This field cannot be blank', required = True)
-        parser.add_argument('eid', help='This field cannot be blank', required = True)
         parser.add_argument('name', help='name cannot be blank',required=True)
         parser.add_argument('userIC', help='userIC cannot be blank',required=True)
         parser.add_argument('mobilePhone', help='mobilePhone cannot be blank', required=True)
+        parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=True)
+        parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
+        parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
 
         # Check if a GP does not exist in database
@@ -52,6 +54,28 @@ class IncidentResource(Resource):
                             latitude=latitude, assignedBy=data['assignedBy'], gpid=gpid, eid=data['eid'])
         db.session.add(incident)
         db.session.commit()
+
+        #update incident_request_assistanceType table
+        for x in data['assistance_type']:
+            aid = AssistanceType.query.filter_by(aid=x).first()
+            incident.assist.append(aid)
+            db.session.add(incident)
+            db.session.commit()
+
+        #update incident_has_emergencyType table  
+        for y in data['emergency_type']:
+            eid = EmergencyType.query.filter_by(eid=y).first()
+            incident.emergency.append(eid)
+            db.session.add(incident)
+            db.session.commit()
+
+        #update incident_assign_to_relevantAgencies table    
+        for z in data['relevant_agencies']:
+            agencyid = RelevantAgencies.query.filter_by(agencyid=z).first()
+            incident.agency.append(agencyid)
+            db.session.add(incident)
+            db.session.commit()
+
         return data
           
 

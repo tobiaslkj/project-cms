@@ -5,27 +5,34 @@ from flaskapp.model.User import User
 
 #For a time being putting all inside the same file first - seperate the class later
 
+#incident has emergencyType M2M relationship table
+incident_has_emergencyType = db.Table('incident_has_emergencyType',
+    db.Column('eid', db.Integer, db.ForeignKey('emergency_type.eid')),
+    db.Column('incidentID', db.Integer, db.ForeignKey('incident.incidentID'))
+)
+    
 class EmergencyType(db.Model):
     __tablename__ = 'emergency_type'
     eid = db.Column(db.Integer, primary_key=True)
-    emergType = db.Column(db.String(30), unique=True, nullable=False)
-    emerType = db.relationship('Incident', backref='EmergencyType', lazy=True)
-
+    emergencyName = db.Column(db.String(30), unique=True, nullable=False)
+    emergencyAssociation = db.relationship('Incident', secondary=incident_has_emergencyType, backref=db.backref('emergency', lazy='dynamic'))
+    
     def __init__(self, **kwargs):
         super(EmergencyType, self).__init__(**kwargs)
 
+
 #request M2M relationship table
-request_table = db.Table('request_table',
+incident_request_assistanceType = db.Table('incident_request_assistanceType',
     db.Column('aid', db.Integer, db.ForeignKey('assistance_type.aid')),
     db.Column('incidentID', db.Integer, db.ForeignKey('incident.incidentID'))
 )
-
-# #M2M with incident
+   
+#M2M with incident
 class AssistanceType(db.Model):
     __tablename__ = 'assistance_type'
     aid = db.Column(db.Integer, primary_key=True)
     assistanceName = db.Column(db.String(30),unique=True, nullable=False)
-    requestAssociation = db.relationship('Incident', secondary=request_table, backref=db.backref('assist', lazy='dynamic'))
+    requestAssociation = db.relationship('Incident', secondary=incident_request_assistanceType, backref=db.backref('assist', lazy='dynamic'))
   
     def __init__(self, **kwargs):
         super(AssistanceType, self).__init__(**kwargs)
@@ -43,8 +50,8 @@ class GeneralPublic(db.Model):
         super(GeneralPublic, self).__init__(**kwargs)
 
 
-#assign_to M2M relationship table
-assign_to = db.Table('assign_to',
+#incidnet assign_to relevantAgencies M2M relationship table
+incident_assign_to_relevantAgencies = db.Table('incident_assign_to_relevantAgencies',
     db.Column('agencyid', db.Integer, db.ForeignKey('relevant_agencies.agencyid')),
     db.Column('incidentID', db.Integer, db.ForeignKey('incident.incidentID')),
     db.Column('link', db.String(255)),
@@ -58,7 +65,7 @@ class RelevantAgencies(db.Model):
     agencyid = db.Column(db.Integer, primary_key=True)
     agencyName = db.Column(db.String(50), unique=False, nullable=False)
     agencyNumber = db.Column(db.Integer, unique=True, nullable=False)
-    assignAssociation = db.relationship('Incident', secondary=assign_to, backref=db.backref('agency', lazy='dynamic'))
+    assignAssociation = db.relationship('Incident', secondary=incident_assign_to_relevantAgencies, backref=db.backref('agency', lazy='dynamic'))
 
     def __init__(self, **kwargs):
         super(RelevantAgencies, self).__init__(**kwargs)
@@ -74,10 +81,6 @@ class Incident(db.Model):
     longtitude = db.Column(db.String(120), unique=False, nullable=False)
     latitude = db.Column(db.String(120), unique=False, nullable=False)
     
-    #Have to change assignedBy, hardcoding it now
-    assignedBy = db.Column(db.String(50), unique=False, nullable=False)
-    
-    eid = db.Column(db.Integer, db.ForeignKey('emergency_type.eid'))
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
     timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 

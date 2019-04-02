@@ -11,13 +11,14 @@ from flaskapp import db
 from flaskapp.model import *
 from flaskapp.model.Incident import *
 
+#give front end all the emergencyType, assistanceType, Relevant Agencies
 db.create_all()
-emergencyType1 = EmergencyType(eid=1, emergType="Fire")
-emergencyType2 = EmergencyType(eid=2, emergType="Flood")
-emergencyType3 = EmergencyType(eid=3, emergType="Earthquake")
-emergencyType4 = EmergencyType(eid=4, emergType="Gas Leak")
-emergencyType5 = EmergencyType(eid=5, emergType="Drought")
-emergencyType6 = EmergencyType(eid=6, emergType="Terrorist")
+emergencyType1 = EmergencyType(eid=1, emergencyName="Fire")
+emergencyType2 = EmergencyType(eid=2, emergencyName="Flood")
+emergencyType3 = EmergencyType(eid=3, emergencyName="Earthquake")
+emergencyType4 = EmergencyType(eid=4, emergencyName="Gas Leak")
+emergencyType5 = EmergencyType(eid=5, emergencyName="Drought")
+emergencyType6 = EmergencyType(eid=6, emergencyName="Terrorist")
 db.session.add(emergencyType1)
 db.session.add(emergencyType2)
 db.session.add(emergencyType3)
@@ -41,7 +42,7 @@ db.session.add(relevantAgencies1)
 db.session.add(relevantAgencies2)
 db.session.add(relevantAgencies3)
 
-status1 = Status(statusID=1, statusName="Pending")
+status1 = Status(statusID=1, statusName="Pending") #give front end the next stage status
 status2 = Status(statusID=2, statusName="Ongoing")
 status3 = Status(statusID=3, statusName="Resolved")
 status4 = Status(statusID=4, statusName="Rejected")
