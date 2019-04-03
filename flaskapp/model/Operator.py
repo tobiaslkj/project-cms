@@ -18,7 +18,9 @@ class Operator(User):
     operatorid = db.Column(db.Integer, ForeignKey('user.uid'), primary_key=True)
 
     def getClaimsOfUser(self):
-        return{
-            "id":self.operatorid,
-            'role': 'operator'
+        parentClaim = super().getClaimsOfUser()
+        childClaim = {
+            "operatorid":self.operatorid,
+            'type': super().discriminator
         }
+        return {**parentClaim, **childClaim}

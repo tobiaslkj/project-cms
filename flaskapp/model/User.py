@@ -34,8 +34,9 @@ class User(db.Model): #all table need to extend db.Model
     @staticmethod
     def findUserByIC(userICQuery):
         from .Operator import Operator
-        entity = with_polymorphic(User, Operator)
-        return db.session.query(entity).filter_by(userIC = userICQuery).first()
+        # entity = with_polymorphic(User, '*')
+        # return db.session.query(entity).filter_by(userIC = userICQuery).first()
+        return User.query.filter_by(userIC=userICQuery).first()
     
     @staticmethod
     def authenticate(userIC, password):
@@ -44,3 +45,11 @@ class User(db.Model): #all table need to extend db.Model
             return user
         else:
             return False
+    
+
+    def getClaimsOfUser(self):
+        return {
+            "id": self.uid,
+            "userIC": self.userIC,
+            "role": self.discriminator
+        }
