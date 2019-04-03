@@ -42,7 +42,8 @@ db.session.add(relevantAgencies1)
 db.session.add(relevantAgencies2)
 db.session.add(relevantAgencies3)
 
-status1 = Status(statusID=1, statusName="Pending") #give front end the next stage status
+#give front end the next stage status
+status1 = Status(statusID=1, statusName="Pending") 
 status2 = Status(statusID=2, statusName="Ongoing")
 status3 = Status(statusID=3, statusName="Resolved")
 status4 = Status(statusID=4, statusName="Rejected")

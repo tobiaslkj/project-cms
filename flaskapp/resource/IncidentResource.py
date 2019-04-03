@@ -1,13 +1,15 @@
 from flask_restful import Resource, reqparse
 from flaskapp import db
-from flask import Flask, request, json, jsonify
+from flask import Flask, jsonify
 from flaskapp.model.Incident import *
 from datetime import datetime
 import requests, json
 from flaskapp.utility.WeblinkGenerator import generateURL
 from flaskapp.access_control import operator_required
 
-class IncidentResource(Resource):
+
+#General Public create incident, status is Pending
+class IncidentResource(Resource): 
     def get(self):
         return {'Incident': 'world' }
 
@@ -78,6 +80,16 @@ class IncidentResource(Resource):
 
         # Store the current session data into database.
         db.session.commit()
+
+        #get the statusID of pending from status table
+        status = Status.query.filter_by(statusName="Pending").first()
+        statusID = status.statusID
+
+        #update incident_has_status table
+        status = IncidentHasStatus(statusID=statusID,incidentID=incident.incidentID,gpid=gpid)
+        db.session.add(status)
+        db.session.commit()
+
 
         return data
           
