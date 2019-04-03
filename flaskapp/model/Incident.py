@@ -101,7 +101,8 @@ class IncidentHasStatus(db.Model):
     statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
     statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
     incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
-    uid = db.Column(db.Integer, db.ForeignKey('user.uid'))
+    #uid = db.Column(db.Integer, db.ForeignKey('user.uid'))
+    gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
 
     def __init__(self, **kwargs):
         super(IncidentHasStatus, self).__init__(**kwargs)
