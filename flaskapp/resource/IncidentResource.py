@@ -2,9 +2,10 @@ from flask_restful import Resource, reqparse
 from flaskapp import db
 from flask import Flask, jsonify
 from flaskapp.model.Incident import *
-from flaskapp.model.Incident import GeneralPublic
 from datetime import datetime
 import requests, json
+from flaskapp.utility.WeblinkGenerator import generateURL
+from flaskapp.access_control import operator_required
 
 
 #General Public create incident, status is Pending
@@ -12,6 +13,7 @@ class IncidentResource(Resource):
     def get(self):
         return {'Incident': 'world' }
 
+    @operator_required
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('address', help='Address field cannot be blank', required = True)
@@ -48,7 +50,6 @@ class IncidentResource(Resource):
         postalCode = result['results'][0]['POSTAL']
         address = result['results'][0]['ADDRESS']
 
-        print(latitude, longtitude, postalCode, address)
 
 
         # Create the incident instance and add to db
@@ -62,21 +63,23 @@ class IncidentResource(Resource):
             aid = AssistanceType.query.filter_by(aid=x).first()
             incident.assist.append(aid)
             db.session.add(incident)
-            db.session.commit()
 
         #update incident_has_emergencyType table  
         for y in data['emergency_type']:
             eid = EmergencyType.query.filter_by(eid=y).first()
             incident.emergency.append(eid)
             db.session.add(incident)
-            db.session.commit()
 
-        #update incident_assign_to_relevantAgencies table    
+        # Create an instance of the many to many derived table
+        # using the incident instance and agencyid instance)
         for z in data['relevant_agencies']:
-            agencyid = RelevantAgencies.query.filter_by(agencyid=z).first()
-            incident.agency.append(agencyid)
-            db.session.add(incident)
-            db.session.commit()
+            randomURL = generateURL()
+            agencyid = RelevantAgency.query.filter_by(agencyid=z).first()
+            assignment = IncidentAssignedToRelevantAgencies(incident=incident, relevantAgency=agencyid, link=randomURL)
+            db.session.add(assignment)
+
+        # Store the current session data into database.
+        db.session.commit()
 
         #get the statusID of pending from status table
         status = Status.query.filter_by(statusName="Pending").first()
