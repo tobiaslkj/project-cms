@@ -1,6 +1,7 @@
 from flaskapp import db
 from sqlalchemy.orm import relationship
 from datetime import datetime
+import pytz
 from flaskapp.model.User import User
 from flaskapp.model.Operator import *
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -91,7 +92,7 @@ class Incident(db.Model):
     latitude = db.Column(db.String(120), unique=False, nullable=False)
     
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
-    timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone('Asia/Singapore')))
 
     # Relationships
     # Association of proxy incident_assigned_to_relevant_agencies to releevant_agencies
@@ -110,7 +111,7 @@ class Status(db.Model):
 
 class IncidentHasStatus(db.Model):
     __tablename__ = 'incident_has_status'
-    statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
+    statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.now(pytz.timezone('Asia/Singapore')))
     statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
     incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
     operatorid = db.Column(db.Integer, db.ForeignKey('operator.operatorid'))
