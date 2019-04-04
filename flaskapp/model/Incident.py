@@ -2,6 +2,7 @@ from flaskapp import db
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from flaskapp.model.User import User
+from flaskapp.model.Operator import *
 from sqlalchemy.ext.associationproxy import association_proxy
 
 #For a time being putting all inside the same file first - seperate the class later
@@ -112,8 +113,8 @@ class IncidentHasStatus(db.Model):
     statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
     statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
     incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
-    #uid = db.Column(db.Integer, db.ForeignKey('user.uid'))
-    gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
+    operatorid = db.Column(db.Integer, db.ForeignKey('operator.operatorid'))
+    
 
     def __init__(self, **kwargs):
         super(IncidentHasStatus, self).__init__(**kwargs)

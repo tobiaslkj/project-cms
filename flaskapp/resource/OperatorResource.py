@@ -12,6 +12,7 @@ class OperatorResource(Resource):
         # to get the claims, use get_jwt_claims
         # Returns a dictonary of the user information
         user_info = get_jwt_claims()
+        pprint(user_info)
 
         return {'hello': user_info }
 
