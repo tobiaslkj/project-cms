@@ -8,7 +8,7 @@ import requests, json
 from flaskapp.utility.WeblinkGenerator import generateURL
 from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
-
+from flaskapp.utility.SMSSender import send_sms
 
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
@@ -128,6 +128,8 @@ class IncidentResource(Resource):
             for z in data['relevant_agencies']:
                 randomURL = generateURL()
                 agencyid = RelevantAgency.query.filter_by(agencyid=z).first()
+                number = f'+65 {agencyid.agencyNumber}' 
+                send_sms(number, f'http://tobiaslkj.com/{randomURL}')
                 assignment = IncidentAssignedToRelevantAgencies(incident=incident, relevantAgency=agencyid, link=randomURL)
                 db.session.add(assignment)
 
