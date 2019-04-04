@@ -10,10 +10,7 @@ from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
 
 
-#General Public create incident, status is Pending
-#!!! is this the GP post from our website or is the operator submit the GP incident into the system?
-# if is GP post from our website: dont have relevant agencies, dont have operatorid in incident_has_status table and status is pending
-# if is operator submit the GP incident, den status should be ongoing cos alr approved and not pending
+#Operator create incident from user call in, status = "Ongoing"
 class IncidentResource(Resource): 
     def get(self):
         return {'Incident': 'world' }
