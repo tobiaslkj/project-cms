@@ -3,12 +3,49 @@ from flaskapp import db
 from flask import Flask, request, json, jsonify
 from flaskapp.model.Incident import *
 from flaskapp.model.Incident import GeneralPublic
+
 from datetime import datetime
-import requests, json
+import requests
 
 class IncidentResource(Resource):
     def get(self):
-        return {'Incident': 'world' }
+        parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument('status', help='status field cannot be blank', required = True)
+        parser.add_argument('order', help='order field cannot be blank', required = True)
+        data = parser.parse_args()
+
+       # return incident of pending status and asc date order
+        if(data['status'] == 'Ongoing' and  data['order'] == 'Asc'):
+            for i, h, s in db.session.query(Incident, IncidentHasStatus, Status).\
+                filter(Status.statusName=='Ongoing').\
+                filter(Incident.incidentID==IncidentHasStatus.incidentID).\
+                filter(IncidentHasStatus.statusID==Status.statusID).order_by(Incident.incidentID).all():
+                aType = db.session.query(AssistanceType).filter(AssistanceType.requestAssociation.any(Incident.incidentID==i.incidentID)).all()
+                eType = db.session.query(EmergencyType).filter(EmergencyType.emergencyAssociation.any(Incident.incidentID==i.incidentID)).all()
+                relevantAgent = db.session.query(RelevantAgencies).filter(RelevantAgencies.assignAssociation.any(Incident.incidentID==i.incidentID)).all()
+                
+
+            
+        elif (data['status'] == 'Ongoing' and  data['order'] == 'Desc'):
+             for i, h, s in db.session.query(Incident, IncidentHasStatus, Status).\
+                filter(Status.statusName=='Ongoing').\
+                filter(Incident.incidentID==IncidentHasStatus.incidentID).\
+                filter(IncidentHasStatus.statusID==Status.statusID).order_by(Incident.incidentID.desc()).all():
+                aType = db.session.query(AssistanceType).filter(AssistanceType.requestAssociation.any(Incident.incidentID==i.incidentID)).all()
+                eType = db.session.query(EmergencyType).filter(EmergencyType.emergencyAssociation.any(Incident.incidentID==i.incidentID)).all()
+                relevantAgent = db.session.query(RelevantAgencies).filter(RelevantAgencies.assignAssociation.any(Incident.incidentID==i.incidentID)).all()
+
+
+            
+        
+            # incident = db.session.query(Incident).join(IncidentHasStatus).join(Status).filter(Status.statusName=='Pending').order_by(Incident.incidentID).all()
+            # for i in incident:
+            #     print(i.incidentID, i.postalCode, i.address, i.longtitude, i.latitude, i.gpid, i.timeStamp)
+            #     incident_status = db.session.query(IncidentHasStatus).join(Incident).filter(IncidentHasStatus.incidentID==i.incidentID)
+            #     for s in incident_status:
+            #         print(s.statusTime, s.statusID, s.incidentID, s.uid)
+
+        return data
 
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
@@ -39,14 +76,11 @@ class IncidentResource(Resource):
 
         # extract result in json format
         result = response.json()
-        print(response.content)
 
         latitude = result['results'][0]['LATITUDE']
         longtitude = result['results'][0]['LONGTITUDE']
         postalCode = result['results'][0]['POSTAL']
         address = result['results'][0]['ADDRESS']
-
-        print(latitude, longtitude, postalCode, address)
 
 
         # Create the incident instance and add to db

@@ -15,7 +15,7 @@ class EmergencyType(db.Model):
     __tablename__ = 'emergency_type'
     eid = db.Column(db.Integer, primary_key=True)
     emergencyName = db.Column(db.String(30), unique=True, nullable=False)
-    emergencyAssociation = db.relationship('Incident', secondary=incident_has_emergencyType, backref=db.backref('emergency', lazy='dynamic'))
+    emergencyAssociation = db.relationship('Incident', secondary=incident_has_emergencyType, backref=db.backref('emergency', lazy='joined'))
     
     def __init__(self, **kwargs):
         super(EmergencyType, self).__init__(**kwargs)
@@ -65,7 +65,7 @@ class RelevantAgencies(db.Model):
     agencyid = db.Column(db.Integer, primary_key=True)
     agencyName = db.Column(db.String(50), unique=False, nullable=False)
     agencyNumber = db.Column(db.Integer, unique=True, nullable=False)
-    assignAssociation = db.relationship('Incident', secondary=incident_assign_to_relevantAgencies, backref=db.backref('agency', lazy='dynamic'))
+    assignAssociation = db.relationship('Incident', secondary=incident_assign_to_relevantAgencies, backref=db.backref('agency', lazy='joined'))
 
     def __init__(self, **kwargs):
         super(RelevantAgencies, self).__init__(**kwargs)
@@ -83,7 +83,7 @@ class Incident(db.Model):
     
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
     timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-
+    
 
     def __init__(self, **kwargs):
         super(Incident, self).__init__(**kwargs)
@@ -102,6 +102,7 @@ class IncidentHasStatus(db.Model):
     statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
     incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
     uid = db.Column(db.Integer, db.ForeignKey('user.uid'))
+    
 
     def __init__(self, **kwargs):
         super(IncidentHasStatus, self).__init__(**kwargs)
