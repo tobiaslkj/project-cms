@@ -2,6 +2,8 @@ from flaskapp import db
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from flaskapp.model.User import User
+from flaskapp.model.Operator import *
+from sqlalchemy.ext.associationproxy import association_proxy
 
 #For a time being putting all inside the same file first - seperate the class later
 
@@ -50,29 +52,36 @@ class GeneralPublic(db.Model):
         super(GeneralPublic, self).__init__(**kwargs)
 
 
-#incidnet assign_to relevantAgencies M2M relationship table
-incident_assign_to_relevantAgencies = db.Table('incident_assign_to_relevantAgencies',
-    db.Column('agencyid', db.Integer, db.ForeignKey('relevant_agencies.agencyid')),
-    db.Column('incidentID', db.Integer, db.ForeignKey('incident.incidentID')),
-    db.Column('link', db.String(255)),
-    db.Column('ackTimeStamp', db.DateTime)
-    )
+class IncidentAssignedToRelevantAgencies(db.Model):
+    _tablename_ = "incident_assigned_to_relevant_agencies"
+
+    # Attributes
+    agency_id = db.Column(db.Integer, db.ForeignKey('relevant_agency.agencyid'), primary_key=True)
+    incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'), primary_key=True)
+    link = db.Column(db.String(255))
+    ackTimeStamp = db.Column(db.DateTime)
+
+    # Relationships
+    incident = db.relationship('Incident', backref=db.backref("incident_assigned_to_relevant_agencies", cascade="all, delete-orphan"))
+    relevantAgency = db.relationship("RelevantAgency")
+
    
 
 #M2M with incident
-class RelevantAgencies(db.Model):
-    _tablename_ = 'relevant_agencies'
+class RelevantAgency(db.Model):
+    _tablename_ = 'relevant_agency'
     agencyid = db.Column(db.Integer, primary_key=True)
     agencyName = db.Column(db.String(50), unique=False, nullable=False)
     agencyNumber = db.Column(db.Integer, unique=True, nullable=False)
-    assignAssociation = db.relationship('Incident', secondary=incident_assign_to_relevantAgencies, backref=db.backref('agency', lazy='dynamic'))
 
     def __init__(self, **kwargs):
-        super(RelevantAgencies, self).__init__(**kwargs)
+        super(RelevantAgency, self).__init__(**kwargs)
 
 
 class Incident(db.Model):
     __tablename__ = 'incident'
+
+    # Attributes
     incidentID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     postalCode = db.Column(db.String(10), unique=False, nullable=False)
     address = db.Column(db.String(200), unique=False, nullable=False)
@@ -84,6 +93,9 @@ class Incident(db.Model):
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
     timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
+    # Relationships
+    # Association of proxy incident_assigned_to_relevant_agencies to releevant_agencies
+    relevantAgencies = association_proxy('incident_assigned_to_relevant_agencies', 'relevant_agency')
 
     def __init__(self, **kwargs):
         super(Incident, self).__init__(**kwargs)
@@ -101,7 +113,8 @@ class IncidentHasStatus(db.Model):
     statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.utcnow)
     statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
     incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
-    uid = db.Column(db.Integer, db.ForeignKey('user.uid'))
+    operatorid = db.Column(db.Integer, db.ForeignKey('operator.operatorid'))
+    
 
     def __init__(self, **kwargs):
         super(IncidentHasStatus, self).__init__(**kwargs)

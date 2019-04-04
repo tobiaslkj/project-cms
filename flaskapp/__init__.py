@@ -21,10 +21,7 @@ from flaskapp import routes
 
 @jwt.user_claims_loader
 def jwt_extend_claims_override(user):
-    return {
-        "userIC": user.userIC,
-        "role": user.discriminator
-    }
+    return user.getClaimsOfUser()
 
 @jwt.user_identity_loader
 def jwt_extend_identity_override(user):
