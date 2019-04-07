@@ -12,11 +12,10 @@ from flaskapp.utility.SMSSender import send_sms
 
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
-class IncidentResource(Resource): 
+class GPIncidentResource(Resource): 
     def get(self):
         return {'Incident': 'world' }
 
-    @operator_required
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('address', help='Address field cannot be blank', required = True)
@@ -26,19 +25,19 @@ class IncidentResource(Resource):
         parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=True)
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
         parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
+        parser.add_argument('gp_create', default=False, required=False)
         data = parser.parse_args()
-            
-        # If gp_create = False, it is operator create incident
-        # Check if a GP exist in database
+
+        #check if the gp exist in database
         if(GeneralPublic.query.filter_by(userIC=data['userIC']).first() is None):
             gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
             db.session.add(gp)
             db.session.commit()
-        
+
+        #get the gpid
         gp = GeneralPublic.query.filter_by(userIC=data['userIC']).first()
         gpid = gp.gpid
-    
-        
+
         # get the full address lat, long and postalCode
         address = data['address']
         oneMap = "https://developers.onemap.sg/commonapi/search?searchVal=%s&returnGeom=Y&getAddrDetails=Y" %(address)
@@ -56,7 +55,7 @@ class IncidentResource(Resource):
 
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 
-                            latitude=latitude, gpid=gpid)
+                        latitude=latitude, gpid=gpid)
         db.session.add(incident)
         db.session.commit()
 
@@ -72,35 +71,9 @@ class IncidentResource(Resource):
             incident.emergency.append(eid)
             db.session.add(incident)
 
-        # Create an instance of the many to many derived table
-        # using the incident instance and agencyid instance)
-        for z in data['relevant_agencies']:
-            randomURL = generateURL()
-            agencyid = RelevantAgency.query.filter_by(agencyid=z).first()
-            number = f'+65 {agencyid.agencyNumber}' 
-            send_sms(number, f'http://tobiaslkj.com/{randomURL}')
-            assignment = IncidentAssignedToRelevantAgencies(incident=incident, relevantAgency=agencyid, link=randomURL)
-            db.session.add(assignment)
-
         # Store the current session data into database.
         db.session.commit()
-
-        #get the statusID of Ongoing from status table
-        status = Status.query.filter_by(statusName="Ongoing").first()
-        statusID = status.statusID
-
-        #get the operator id
-        operatorInfo = get_jwt_claims()
-        operatorid = operatorInfo['operatorid']
-
-        #update incident_has_status table
-        status = IncidentHasStatus(statusID=statusID,incidentID=incident.incidentID,operatorid=operatorid)
-        db.session.add(status)
-        db.session.commit()
-
-
         return data
-          
 
     def put(self):
         return {"wow":"oklor"}
