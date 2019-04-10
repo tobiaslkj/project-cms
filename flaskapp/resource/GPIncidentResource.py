@@ -72,6 +72,15 @@ class GPIncidentResource(Resource):
             incident.emergencyType.append(eid)
             db.session.add(incident)
 
+        #get the statusID of Ongoing from status table
+        status = Status.query.filter_by(statusName="Pending").first()
+        print(status)
+        statusID = status.statusID
+
+        #update incident_has_status table
+        status = IncidentHasStatus(statusID=statusID,incidentID=incident.incidentID)
+        db.session.add(status)
+
         # Store the current session data into database.
         db.session.commit()
         return {"msg":"Incident created."},201

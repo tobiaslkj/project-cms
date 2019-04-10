@@ -93,6 +93,7 @@ class Incident(db.Model):
     latitude = db.Column(db.String(120), unique=False, nullable=False)
     
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
+    operatorID = db.Column(db.Integer, db.ForeignKey('operator.operatorid'))
     timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone('Asia/Singapore')))
 
     # Relationships
@@ -120,7 +121,6 @@ class IncidentHasStatus(db.Model):
     statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.now(pytz.timezone('Asia/Singapore')))
     statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
     incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
-    operatorid = db.Column(db.Integer, db.ForeignKey('operator.operatorid'))
 
     # Relationships
     incident = db.relationship('Incident', backref=db.backref("incident_has_status", cascade="all, delete-orphan"))

@@ -100,9 +100,13 @@ class IncidentResource(Resource):
         postalCode = result['results'][0]['POSTAL']
         address = result['results'][0]['ADDRESS']
 
+        #get the operator id
+        operatorInfo = get_jwt_claims()
+        operatorid = operatorInfo['operatorid']
+
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 
-                            latitude=latitude, gpid=gpid, description=data['description'])
+                            latitude=latitude, gpid=gpid, description=data['description'], operatorID=operatorid)
         db.session.add(incident)
         db.session.commit()
 
@@ -127,7 +131,7 @@ class IncidentResource(Resource):
             send_sms(number, f'http://tobiaslkj.com/{randomURL}')
             assignment = IncidentAssignedToRelevantAgencies(incident=incident, relevantAgency=agencyid, link=randomURL)
             db.session.add(assignment)
-
+        
         # Store the current session data into database.
         db.session.commit()
 
@@ -135,12 +139,8 @@ class IncidentResource(Resource):
         status = Status.query.filter_by(statusName="Ongoing").first()
         statusID = status.statusID
 
-        #get the operator id
-        operatorInfo = get_jwt_claims()
-        operatorid = operatorInfo['operatorid']
-
         #update incident_has_status table
-        status = IncidentHasStatus(statusID=statusID,incidentID=incident.incidentID,operatorid=operatorid)
+        status = IncidentHasStatus(statusID=statusID,incidentID=incident.incidentID)
         db.session.add(status)
         db.session.commit()
 
