@@ -18,7 +18,9 @@ class GovernmentOfficial(User):
     governmentid = db.Column(db.Integer, ForeignKey('user.uid'), primary_key=True)
 
     def getClaimsOfUser(self):
-        return{
-            "id":self.operatorid,
-            'role': 'operator'
+        parentClaim = super().getClaimsOfUser()
+        childClaim = {
+            "governmentid":self.governmentid,
+            'type': super().discriminator
         }
+        return {**parentClaim, **childClaim}

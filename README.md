@@ -94,3 +94,6 @@ Some additional resource to help you all. Please feel free to add on.
 https://realpython.com/instance-class-and-static-methods-demystified/
 https://stackoverflow.com/questions/39983695/what-is-truthy-and-falsy-in-python-how-is-it-different-from-true-and-false
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-i-hello-world
+
+Many to Many with attributes in derived table: 
+https://docs.sqlalchemy.org/en/latest/orm/extensions/associationproxy.html

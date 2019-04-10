@@ -35,14 +35,15 @@ db.session.add(assistanceType2)
 db.session.add(assistanceType3)
 db.session.add(assistanceType4)
 
-relevantAgencies1 = RelevantAgencies(agencyid=1, agencyName="Singapore Civil Defence Force", agencyNumber=999)
-relevantAgencies2 = RelevantAgencies(agencyid=2, agencyName="Hospital", agencyNumber=995)
-relevantAgencies3 = RelevantAgencies(agencyid=3, agencyName="Singapore Power", agencyNumber=62222333)
+relevantAgencies1 = RelevantAgency(agencyid=1, agencyName="Singapore Civil Defence Force", agencyNumber=83682798)
+relevantAgencies2 = RelevantAgency(agencyid=2, agencyName="SPF", agencyNumber=83669795)
+relevantAgencies3 = RelevantAgency(agencyid=3, agencyName="Singapore Power", agencyNumber=93289155)
 db.session.add(relevantAgencies1)
 db.session.add(relevantAgencies2)
 db.session.add(relevantAgencies3)
 
-status1 = Status(statusID=1, statusName="Pending") #give front end the next stage status
+#give front end the next stage status
+status1 = Status(statusID=1, statusName="Pending") 
 status2 = Status(statusID=2, statusName="Ongoing")
 status3 = Status(statusID=3, statusName="Resolved")
 status4 = Status(statusID=4, statusName="Rejected")

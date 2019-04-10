@@ -1,14 +1,18 @@
 from flask_restful import Resource, reqparse
 from flaskapp import db
 from flaskapp.model.GovernmentOfficial import GovernmentOfficial
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_claims
 
 class GovernmentOfficialResource(Resource):
+    # As currently there is no route to limit only for government official,
+    # we can use jwt_required to secure government_official routes
+    # as operator can access what a government official can do, we can
+    # just check if the request has a valid token
     @jwt_required
     def get(self):
-        current_user = get_jwt_identity()
+        user_info = get_jwt_claims()
 
-        return {'hello': current_user }
+        return {'hello': userinfo }
 
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
