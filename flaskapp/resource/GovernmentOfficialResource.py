@@ -28,7 +28,7 @@ class GovernmentOfficialResource(Resource):
         # create GovernmentOfficial instance and add in database
         governmentofficial = GovernmentOfficial(name=data['name'],userIC=data['userIC'],password=data['password'])
         governmentofficial.save()
-        return parser.parse_args()
+        return {"msg":"Government official account has been created."}, 201
     
     def put(self):
         return {"wow":"oklor"}

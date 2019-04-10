@@ -19,7 +19,7 @@ class SessionResource(Resource):
             access_token = create_access_token(identity=user)
             return {'token':access_token}, 200
         else:
-            return {"message":"wrong password"}
+            return {"msg":"wrong password"}
 
     def put(self):
         return {"wow":"oklor"}
