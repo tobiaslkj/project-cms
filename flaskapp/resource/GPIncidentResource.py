@@ -73,7 +73,7 @@ class GPIncidentResource(Resource):
 
         # Store the current session data into database.
         db.session.commit()
-        return data
+        return {"msg":"Incident created."},201
 
     def put(self):
         return {"wow":"oklor"}

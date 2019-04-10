@@ -30,7 +30,7 @@ class OperatorResource(Resource):
         # create operator instance and add in database
         operator = Operator(name=data['name'],userIC=data['userIC'],password=data['password'])
         operator.save()
-        return parser.parse_args()
+        return {"msg":"Operator account has been created."}, 201
 
     @jwt_required
     def put(self):

@@ -99,7 +99,7 @@ class IncidentResource(Resource):
         db.session.commit()
 
 
-        return data
+        return {"msg":"Incident created."},201
           
 
     def put(self):
