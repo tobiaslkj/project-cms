@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse
 from flaskapp import db
-from flask import Flask, jsonify
+from flask import Flask, jsonify, abort
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
 from datetime import datetime 
@@ -129,9 +129,46 @@ class IncidentResource(Resource):
 
         return {"msg":"Incident created."},201
           
+    @operator_required
+    def patch(self, incidentID=None):
+        if incidentID is None:
+            abort(404)
 
-    def put(self):
-        return {"wow":"oklor"}
+        parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
+        data = parser.parse_args()
+
+        ## ensure that the array is not zerio legnth 
+        if(len(data['relevant_agencies']) is 0):
+            return {"error":"should not have 0 relevant agencies"},422
+        
+        i = Incident.query.get(incidentID)
+        if i is None or len(i.statuses) is not 1: # status should only have 1 length, not length of 1 means its not in pending state
+            return {"msg":"Incident not found"},404
+
+        operatorInfo = get_jwt_claims()
+        o = Operator.query.get(operatorInfo['operatorid'])
+        i.operator = o
+        
+        # attached relevant agencies to this incidnet
+        for raid in data['relevant_agencies']:
+            randomURL = generateURL()
+            ra = RelevantAgency.query.get(raid)
+            number = f'+65 {ra.agencyNumber}' 
+            send_sms(number, f'http://tobiaslkj.com/{randomURL}')
+            iatra = IncidentAssignedToRelevantAgencies(incident=i, relevantAgency=ra, link=randomURL)
+            db.session.add(iatra)
+
+        #Add the relationship of who approved the incident
+        db.session.add(i)
+
+        # add a new row of incident has status
+        s = Status.query.get(2) # id 2 is status pending
+        ihs = IncidentHasStatus(incident = i, status = s)
+        db.session.add(ihs)
+        db.session.commit()
+        
+        return {"msg":"Incident status has been approved"},201
 
     def delete(self):
         return {"wow":"deteled"}
