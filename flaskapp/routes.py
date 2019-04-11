@@ -10,6 +10,6 @@ from .model.User import User
 
 api.add_resource(OperatorResource, '/user/operator')
 api.add_resource(GovernmentOfficialResource, '/user/governmentofficial')
-api.add_resource(IncidentResource, '/incident')
+api.add_resource(IncidentResource, '/incident', '/incident/<int:incidentID>')
 api.add_resource(GPIncidentResource, '/gpincident')
 api.add_resource(SessionResource, '/session')

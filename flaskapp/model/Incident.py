@@ -105,10 +105,11 @@ class Incident(db.Model):
     # Association of proxy incident_assigned_to_relevant_agencies to releevant_agencies
     emergencyType = db.relationship("EmergencyType", secondary=incident_has_emergencyType, backref="incidents")
     assistanceType = db.relationship("AssistanceType", secondary=incident_request_assistanceType, backref="incidents")
-    relevantAgencies = association_proxy('incident_assigned_to_relevant_agencies', 'relevantAgency')
+    relevantAgencies = association_proxy('incident_assigned_to_relevant_agencies', 'relevantAgency',creator=lambda relevantAgency: IncidentAssignedToRelevantAgencies(relevantAgency=relevantAgency))
+    operator = relationship("Operator", backref="incidents")
     # To access list of statues from incident, use incidentInstance.statues. Return a list of status objects
     # to access derived table, from incident table use incidentInstance.incident_has_status or statusInstance.incidents
-    statuses = association_proxy('incident_has_status', 'status')
+    statuses = association_proxy('incident_has_status', 'status',creator=lambda status: IncidentHasStatus(status=status))
 
     def __init__(self, **kwargs):
         super(Incident, self).__init__(**kwargs)
