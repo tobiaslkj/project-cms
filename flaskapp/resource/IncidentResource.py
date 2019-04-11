@@ -182,8 +182,8 @@ class IncidentResource(Resource):
 
         # add a new row of incident has status
         s = Status.query.get(2) # id 2 is status pending
-        i.statuses.append(s)
-        db.session.add(i)
+        ihs = IncidentHasStatus(incident = i, status = s)
+        db.session.add(ihs)
         db.session.commit()
         
         return {"msg":"Incident status has been approved"},201
