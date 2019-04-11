@@ -6,6 +6,7 @@ from flaskapp.model.User import User
 from flaskapp.model.Operator import *
 from sqlalchemy.ext.associationproxy import association_proxy
 from flaskapp import ma
+from marshmallow import fields
 
 #For a time being putting all inside the same file first - seperate the class later
 
@@ -79,10 +80,42 @@ class RelevantAgency(db.Model):
     def __init__(self, **kwargs):
         super(RelevantAgency, self).__init__(**kwargs)
 
-class IncidentSchema(ma.Schema):
-    class Meta:
-        #fields to be exposed into json
-        fields = ("incidentID", "postalCode", "address", "description","longtitude", "latitude", "gpid","operatorID")
+# class IncidentSchema(ma.Schema):
+#     class Meta:
+#         #fields to be exposed into json
+#         fields = ("incidentID", "postalCode", "address", "description","longtitude", "latitude", "gpid","operatorID")
+        
+
+class IncidentHasStatusTimeSchema(ma.Schema):
+    statusTime = fields.DateTime()
+    statusID = fields.Int()
+    #statusName = fields.Nested(StatusSchema, only=["statusName"])
+    
+# class StatusSchema(ma.Schema):
+#     statusID = fields.Int()
+#     statusName = fields.Str()
+    
+class RelevantAgencySchema(ma.Schema):
+    agencyid = fields.Int()
+    agencyName = fields.Str()
+    agencyNumber = fields.Int()
+
+class EmergencyTypeSchema(ma.Schema):
+    eid = fields.Int()
+    emergencyName = fields.Str()
+
+class IncidentSchema(ma.Schema):    
+    incidentID = fields.Int()
+    postalCode = fields.Int()
+    address = fields.Str()
+    description = fields.Str()
+    operatorID = fields.Int()
+    gpid = fields.Int()
+    timeStamp = fields.DateTime()
+    emergencyType = fields.List(fields.Nested(EmergencyTypeSchema, many=True))
+    #statuses = fields.List(fields.Nested(IncidentHasStatusTimeSchema, many=True))
+    relevantAgencies = fields.List(fields.Nested(RelevantAgencySchema, many=True))
+
 
 class Incident(db.Model):
     __tablename__ = 'incident'

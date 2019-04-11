@@ -5,6 +5,7 @@ from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
 from datetime import datetime 
 import requests, json
+import pprint
 from flaskapp.utility.WeblinkGenerator import generateURL
 from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
@@ -13,53 +14,34 @@ from flaskapp.utility.SMSSender import send_sms
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
 class IncidentResource(Resource): 
-    def get(self):
-        parser = reqparse.RequestParser(bundle_errors=True)
-        parser.add_argument('status', help='status field cannot be blank', required = True)
-        parser.add_argument('order', help='order field cannot be blank', required = True)
-        data = parser.parse_args()
-
-       # return incident of Ongoing status and asc order
-        if(data['status'] == 'Ongoing') and  data['order'] == 'Asc':
-            for i, h, s in db.session.query(Incident, IncidentHasStatus, Status).\
-                filter(Status.statusName=='Ongoing').\
-                filter(Incident.incidentID==IncidentHasStatus.incidentID).\
-                filter(IncidentHasStatus.statusID==Status.statusID).order_by(Incident.incidentID).all():
-                #aType = db.session.query(AssistanceType).filter(AssistanceType.requestAssociation.any(Incident.incidentID==i.incidentID)).all()
-                #eType = db.session.query(EmergencyType).filter(EmergencyType.emergencyAssociation.any(Incident.incidentID==i.incidentID)).all()
-                print(i.incidentID, i.postalCode, i.address, i.longtitude, i.latitude, i.gpid, i.timeStamp, i.relevantAgencies)
-                for ra in i.relevantAgencies:
-                    print(ra.agencyid, ra.agencyName)
-                for et in i.emergencyType:
-                    print(et.eid, et.emergencyName)
-                print(h.incidentID, h.statusID, h.statusTime, h.operatorid)
-                print(i.__dict__)
-                print(h.__dict__)
-                print(s.__dict__)
-                print(s.statusID, s.statusName)
-                #print(eType, aType, relevantAgent)
-                # for e in eType:
-                #     print(e.eid,e.emergencyName)
-                # for a in aType:
-                #     print(a.aid,a.assistanceName)
-                # for ra, iar in db.session.query(RelevantAgency, IncidentAssignedToRelevantAgencies).\
-                #     filter(RelevantAgency.agencyid==IncidentAssignedToRelevantAgencies.agency_id).filter(IncidentAssignedToRelevantAgencies.incidentID==i.incidentID).all():
-                # #relevantAgent = db.session.query(RelevantAgency).filter(RelevantAgency.assignAssociation.any(Incident.incidentID==i.incidentID)).all()
-                #     for agent in ra:
-                #             print(agent.agencyid, agent.agencyName, agent.agencyNumber)
-
-
-        #return incident of Ongoing status and desc order  
-        elif (data['status'] == 'Ongoing' and  data['order'] == 'Desc'):
-             for i, h, s in db.session.query(Incident, IncidentHasStatus, Status).\
-                filter(Status.statusName=='Ongoing').\
-                filter(Incident.incidentID==IncidentHasStatus.incidentID).\
-                filter(IncidentHasStatus.statusID==Status.statusID).order_by(Incident.incidentID.desc()).all():
-                aType = db.session.query(AssistanceType).filter(AssistanceType.requestAssociation.any(Incident.incidentID==i.incidentID)).all()
-                eType = db.session.query(EmergencyType).filter(EmergencyType.emergencyAssociation.any(Incident.incidentID==i.incidentID)).all()
-                #relevantAgent = db.session.query(RelevantAgency).filter(RelevantAgency.assignAssociation.any(Incident.incidentID==i.incidentID)).all()
+    def get(self,incident_id):
         
-                return data
+        i = db.session.query(Incident).filter(Incident.incidentID==incident_id).first()
+        user_schema = IncidentSchema()
+        data = user_schema.dump(i)
+        return data
+        #return user_schema.jsonify(i)
+    
+        
+        # json_object['haha'] = 'hahaha'
+        # return json_object
+        # if (i is not None):
+        #     print(i.incidentID)
+        #     print(i.postalCode)
+        #     print(i.address)
+        #     print(i.description)
+        #     print(i.emergencyType)
+        #     print(i.assistanceType)
+        #     if (len(i.relevantAgencies)is not 0):
+        #         print(i.relevantAgencies)
+        #     print(i.timeStamp)
+        #     print(i.statuses)
+        #     gp = db.session.query(GeneralPublic).filter(Incident.gpid==GeneralPublic.gpid).first()
+        #     if (gp is not None):
+        #         print(gp.name)
+        #         print(gp.userIC)
+        #         print(gp.mobilePhone)
+
 
     @operator_required
     def post(self):
@@ -77,7 +59,7 @@ class IncidentResource(Resource):
         # If gp_create = False, it is operator create incident
         # Check if a GP exist in database
         if(GeneralPublic.query.filter_by(userIC=data['userIC']).first() is None):
-            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
+            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'])
             db.session.add(gp)
             db.session.commit()
         
