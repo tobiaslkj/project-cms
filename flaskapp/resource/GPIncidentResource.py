@@ -25,8 +25,6 @@ class GPIncidentResource(Resource):
         parser.add_argument('description', help='description cannot be blank',required=True)
         parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=True)
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
-        parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
-        parser.add_argument('gp_create', default=False, required=False)
         data = parser.parse_args()
 
         #check if the gp exist in database

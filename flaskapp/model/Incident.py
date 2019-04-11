@@ -5,6 +5,7 @@ import pytz
 from flaskapp.model.User import User
 from flaskapp.model.Operator import *
 from sqlalchemy.ext.associationproxy import association_proxy
+from flaskapp import ma
 
 #For a time being putting all inside the same file first - seperate the class later
 
@@ -78,6 +79,10 @@ class RelevantAgency(db.Model):
     def __init__(self, **kwargs):
         super(RelevantAgency, self).__init__(**kwargs)
 
+class IncidentSchema(ma.Schema):
+    class Meta:
+        #fields to be exposed into json
+        fields = ("incidentID", "postalCode", "address", "description","longtitude", "latitude", "gpid","operatorID")
 
 class Incident(db.Model):
     __tablename__ = 'incident'

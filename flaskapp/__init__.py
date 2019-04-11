@@ -4,6 +4,7 @@ from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 from .config import config
 from flask_jwt_extended import JWTManager
+from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = config['FLASK_APP_SECRET']
@@ -17,6 +18,7 @@ app.config['JWT_SECRET_KEY']=config['FLASK_APP_SECRET']
 app.config['JWT_ACCESS_TOKEN_EXPIRES']=86400
 jwt = JWTManager(app)   
 
+ma = Marshmallow(app)
 from flaskapp import routes
 
 @jwt.user_claims_loader
