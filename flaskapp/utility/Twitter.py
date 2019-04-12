@@ -6,7 +6,7 @@ api = twitter.Api(
     access_token_key='1105744338565263360-nKbOjXHmmTwBDUlFUsTGWp3rUb1ymY',
     access_token_secret='1PAWKCy7kOgNCNTDt657YRRA2v45oLRrQa1aV56GsWaDX')
 
-print(api.VerifyCredentials())
 
-status = api.PostUpdate("I LOVE PYTHON TWITTER YAY!")
-print(status.text)
+
+def postToTwitter(message):
+    status = api.PostUpdate(message)
