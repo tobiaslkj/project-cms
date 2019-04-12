@@ -15,8 +15,9 @@ idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.1
-marshmallow==2.19.2
+marshmallow==3.0
 mysqlclient==1.4.2.post1
+pycodestyle==2.5.0
 pycparser==2.19
 PyJWT==1.4.2
 PySocks==1.6.8

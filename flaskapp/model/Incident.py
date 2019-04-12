@@ -5,8 +5,8 @@ import pytz
 from flaskapp.model.User import User
 from flaskapp.model.Operator import *
 from sqlalchemy.ext.associationproxy import association_proxy
-from flaskapp import ma
-from marshmallow import fields
+# from flaskapp import mamake
+from marshmallow import fields, Schema
 
 #For a time being putting all inside the same file first - seperate the class later
 
@@ -18,6 +18,7 @@ incident_has_emergencyType = db.Table('incident_has_emergencyType',
     
 class EmergencyType(db.Model):
     __tablename__ = 'emergency_type'
+    
     eid = db.Column(db.Integer, primary_key=True)
     emergencyName = db.Column(db.String(30), unique=True, nullable=False)
 
@@ -28,6 +29,7 @@ class EmergencyType(db.Model):
 
 #request M2M relationship table
 incident_request_assistanceType = db.Table('incident_request_assistanceType',
+    #db.metadata.reflect(engine=engine),
     db.Column('aid', db.Integer, db.ForeignKey('assistance_type.aid')),
     db.Column('incidentID', db.Integer, db.ForeignKey('incident.incidentID'))
 )
@@ -49,6 +51,7 @@ class GeneralPublic(db.Model):
     name = db.Column(db.String(40), unique=False, nullable=False)  
     userIC = db.Column(db.String(9), unique=True, nullable=False)
     mobilePhone = db.Column(db.String(8), unique=True, nullable=False)
+    
 
     def __init__(self, **kwargs):
         super(GeneralPublic, self).__init__(**kwargs)
@@ -80,41 +83,50 @@ class RelevantAgency(db.Model):
     def __init__(self, **kwargs):
         super(RelevantAgency, self).__init__(**kwargs)
 
-# class IncidentSchema(ma.Schema):
+# class IncidentSchema(Schema):
 #     class Meta:
 #         #fields to be exposed into json
 #         fields = ("incidentID", "postalCode", "address", "description","longtitude", "latitude", "gpid","operatorID")
         
+class StatusSchema(Schema):
+    statusID = fields.Int()
+    statusName = fields.Str()
 
-class IncidentHasStatusTimeSchema(ma.Schema):
+class IncidentHasStatusSchema(Schema):
     statusTime = fields.DateTime()
     statusID = fields.Int()
-    #statusName = fields.Nested(StatusSchema, only=["statusName"])
+    statusName = fields.Nested(StatusSchema, only=["statusName"])
+  
+class GeneralPublicSchema(Schema):
+    gpid = fields.Int()
+    name = fields.Str()
+    userIC = fields.Str()
+    mobilePhone = fields.Int()
+
+class assistanceTypeSchema(Schema):
+    #aid = fields.Int()
+    assistanceName = fields.Str()
     
-# class StatusSchema(ma.Schema):
-#     statusID = fields.Int()
-#     statusName = fields.Str()
-    
-class RelevantAgencySchema(ma.Schema):
-    agencyid = fields.Int()
+class RelevantAgencySchema(Schema):
+    #agencyid = fields.Int()
     agencyName = fields.Str()
     agencyNumber = fields.Int()
 
-class EmergencyTypeSchema(ma.Schema):
-    eid = fields.Int()
+class EmergencyTypeSchema(Schema):
+    #eid = fields.Int()
     emergencyName = fields.Str()
 
-class IncidentSchema(ma.Schema):    
+class IncidentSchema(Schema):    
     incidentID = fields.Int()
     postalCode = fields.Int()
     address = fields.Str()
     description = fields.Str()
     operatorID = fields.Int()
-    gpid = fields.Int()
     timeStamp = fields.DateTime()
-    emergencyType = fields.List(fields.Nested(EmergencyTypeSchema, many=True))
-    #statuses = fields.List(fields.Nested(IncidentHasStatusTimeSchema, many=True))
-    relevantAgencies = fields.List(fields.Nested(RelevantAgencySchema, many=True))
+    reportedUser = fields.Nested(GeneralPublicSchema)
+    emergencyType = fields.List(fields.Nested(EmergencyTypeSchema))
+    assistanceType = fields.List(fields.Nested(assistanceTypeSchema))
+    relevantAgencies = fields.List(fields.Nested(RelevantAgencySchema))
 
 
 class Incident(db.Model):
@@ -140,12 +152,14 @@ class Incident(db.Model):
     assistanceType = db.relationship("AssistanceType", secondary=incident_request_assistanceType, backref="incidents")
     relevantAgencies = association_proxy('incident_assigned_to_relevant_agencies', 'relevantAgency',creator=lambda relevantAgency: IncidentAssignedToRelevantAgencies(relevantAgency=relevantAgency))
     operator = relationship("Operator", backref="incidents")
+    reportedUser = relationship("GeneralPublic", backref="reportedIncident")
     # To access list of statues from incident, use incidentInstance.statues. Return a list of status objects
     # to access derived table, from incident table use incidentInstance.incident_has_status or statusInstance.incidents
     statuses = association_proxy('incident_has_status', 'status',creator=lambda status: IncidentHasStatus(status=status))
 
     def __init__(self, **kwargs):
         super(Incident, self).__init__(**kwargs)
+        
 
 class Status(db.Model):
     __tablename__= 'status'

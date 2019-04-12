@@ -17,31 +17,22 @@ class IncidentResource(Resource):
     def get(self,incident_id):
         
         i = db.session.query(Incident).filter(Incident.incidentID==incident_id).first()
-        user_schema = IncidentSchema()
-        data = user_schema.dump(i)
+        incident_schema = IncidentSchema()
+        
+        statustime_schema = IncidentHasStatusSchema()
+        ihss =[]
+        for ihs in i.incident_has_status:
+            data1 = statustime_schema.dump(ihs)
+            data1['statusname'] = ihs.status.statusName
+            ihss.append(data1)
+            
+        
+        data = incident_schema.dump(i)
+        data['status'] = ihss
         return data
-        #return user_schema.jsonify(i)
+
     
         
-        # json_object['haha'] = 'hahaha'
-        # return json_object
-        # if (i is not None):
-        #     print(i.incidentID)
-        #     print(i.postalCode)
-        #     print(i.address)
-        #     print(i.description)
-        #     print(i.emergencyType)
-        #     print(i.assistanceType)
-        #     if (len(i.relevantAgencies)is not 0):
-        #         print(i.relevantAgencies)
-        #     print(i.timeStamp)
-        #     print(i.statuses)
-        #     gp = db.session.query(GeneralPublic).filter(Incident.gpid==GeneralPublic.gpid).first()
-        #     if (gp is not None):
-        #         print(gp.name)
-        #         print(gp.userIC)
-        #         print(gp.mobilePhone)
-
 
     @operator_required
     def post(self):
