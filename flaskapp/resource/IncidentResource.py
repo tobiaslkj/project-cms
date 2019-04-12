@@ -3,13 +3,14 @@ from flaskapp import db
 from flask import Flask, jsonify, abort
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
-from datetime import datetime 
+from datetime import datetime
 import requests, json
 import pprint
 from flaskapp.utility.WeblinkGenerator import generateURL
 from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
 from flaskapp.utility.SMSSender import send_sms
+from pprint import pprint
 
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
@@ -66,7 +67,6 @@ class IncidentResource(Resource):
 
         # extract result in json format
         result = response.json()
-        print(response.content)
 
         latitude = result['results'][0]['LATITUDE']
         longtitude = result['results'][0]['LONGTITUDE']

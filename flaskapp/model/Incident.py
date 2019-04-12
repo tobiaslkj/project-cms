@@ -123,10 +123,13 @@ class IncidentSchema(Schema):
     description = fields.Str()
     operatorID = fields.Int()
     timeStamp = fields.DateTime()
+    longtitude = fields.Str()
+    latitude = fields.Str()
     reportedUser = fields.Nested(GeneralPublicSchema)
     emergencyType = fields.List(fields.Nested(EmergencyTypeSchema))
     assistanceType = fields.List(fields.Nested(assistanceTypeSchema))
     relevantAgencies = fields.List(fields.Nested(RelevantAgencySchema))
+    statuses = fields.List(fields.Nested(IncidentHasStatusSchema))
 
 
 class Incident(db.Model):

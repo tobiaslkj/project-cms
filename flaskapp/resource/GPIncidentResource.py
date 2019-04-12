@@ -45,7 +45,6 @@ class GPIncidentResource(Resource):
 
         # extract result in json format
         result = response.json()
-        print(response.content)
 
         latitude = result['results'][0]['LATITUDE']
         longtitude = result['results'][0]['LONGTITUDE']
