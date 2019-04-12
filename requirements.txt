@@ -8,14 +8,13 @@ chardet==3.0.4
 Click==7.0
 Flask==1.0.2
 Flask-JWT-Extended==3.18.0
-flask-marshmallow==0.10.0
 Flask-RESTful==0.3.7
 Flask-SQLAlchemy==2.3.2
 idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.1
-marshmallow==3.0
+marshmallow==3.0.0rc5
 mysqlclient==1.4.2.post1
 pycodestyle==2.5.0
 pycparser==2.19
