@@ -6,7 +6,7 @@ from .config import config
 from flask_jwt_extended import JWTManager
 #from flask_marshmallow import Marshmallow
 
-app = Flask(__name__)
+app = Flask(__name__,static_folder='./client', static_url_path='')
 app.config['SECRET_KEY'] = config['FLASK_APP_SECRET']
 sqlURI = "mysql://"+config['DATABASE_USERNAME']+":"+config['DATABASE_PASSWORD']+"@"+config['DATABASE_HOST']+"/"+config['DATABASE_NAME']
 app.config['SQLALCHEMY_DATABASE_URI'] = sqlURI
@@ -29,3 +29,6 @@ def jwt_extend_claims_override(user):
 def jwt_extend_identity_override(user):
     return user.userIC
 
+@app.route('/<path:path>')
+def serve_page(path):
+    return send_from_directory('client', path)
