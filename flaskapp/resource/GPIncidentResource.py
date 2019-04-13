@@ -23,7 +23,7 @@ class GPIncidentResource(Resource):
         parser.add_argument('userIC', help='userIC cannot be blank',required=True)
         parser.add_argument('mobilePhone', help='mobilePhone cannot be blank', required=True)
         parser.add_argument('description', help='description cannot be blank',required=True)
-        parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=True)
+        parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=False)
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
 
@@ -59,10 +59,11 @@ class GPIncidentResource(Resource):
         db.session.commit()
 
         #update incident_request_assistanceType table
-        for x in data['assistance_type']:
-            aid = AssistanceType.query.filter_by(aid=x).first()
-            incident.assistanceType.append(aid)
-            db.session.add(incident)
+        if (data['assistance_type']is not None):
+            for x in data['assistance_type']:
+                aid = AssistanceType.query.filter_by(aid=x).first()
+                incident.assistanceType.append(aid)
+                db.session.add(incident)
 
         #update incident_has_emergencyType table  
         for y in data['emergency_type']:

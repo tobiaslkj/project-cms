@@ -32,15 +32,12 @@ class IncidentResource(Resource):
             data1 = statustime_schema.dump(ihs)
             data1['statusname'] = ihs.status.statusName
             ihss.append(data1)
-            
         
         data = incident_schema.dump(i)
         data['status'] = ihss
         return data
 
     
-        
-
     @operator_required
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
