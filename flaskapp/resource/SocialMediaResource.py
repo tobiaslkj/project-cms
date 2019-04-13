@@ -3,6 +3,7 @@ from flaskapp.utility.Twitter import postToTwitter
 from flask_restful import Resource, reqparse
 
 class SocialMediaResource(Resource): 
+    @operator_required
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('message', help='Address field cannot be blank', required = True)

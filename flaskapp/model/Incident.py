@@ -10,6 +10,9 @@ from marshmallow import fields, Schema
 
 #For a time being putting all inside the same file first - seperate the class later
 
+def sgtimestampnow():
+    return datetime.now(pytz.timezone('Asia/Singapore'))
+
 #incident has emergencyType M2M relationship table
 incident_has_emergencyType = db.Table('incident_has_emergencyType',
     db.Column('eid', db.Integer, db.ForeignKey('emergency_type.eid')),
@@ -123,10 +126,13 @@ class IncidentSchema(Schema):
     description = fields.Str()
     operatorID = fields.Int()
     timeStamp = fields.DateTime()
+    longtitude = fields.Str()
+    latitude = fields.Str()
     reportedUser = fields.Nested(GeneralPublicSchema)
     emergencyType = fields.List(fields.Nested(EmergencyTypeSchema))
     assistanceType = fields.List(fields.Nested(assistanceTypeSchema))
     relevantAgencies = fields.List(fields.Nested(RelevantAgencySchema))
+    statuses = fields.List(fields.Nested(IncidentHasStatusSchema))
 
 
 class Incident(db.Model):
@@ -144,7 +150,7 @@ class Incident(db.Model):
     
     gpid = db.Column(db.Integer, db.ForeignKey('general_public.gpid'))
     operatorID = db.Column(db.Integer, db.ForeignKey('operator.operatorid'))
-    timeStamp=db.Column(db.DateTime, nullable=False, default=datetime.now(pytz.timezone('Asia/Singapore')))
+    timeStamp=db.Column(db.DateTime, nullable=False, default=sgtimestampnow)
 
     # Relationships
     # Association of proxy incident_assigned_to_relevant_agencies to releevant_agencies
@@ -171,7 +177,7 @@ class Status(db.Model):
 
 class IncidentHasStatus(db.Model):
     __tablename__ = 'incident_has_status'
-    statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=datetime.now(pytz.timezone('Asia/Singapore')))
+    statusTime = db.Column(db.DateTime, primary_key=True, nullable=False, default=sgtimestampnow)
     statusID = db.Column(db.Integer, db.ForeignKey('status.statusID'))
     incidentID = db.Column(db.Integer, db.ForeignKey('incident.incidentID'))
 
