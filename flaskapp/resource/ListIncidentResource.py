@@ -22,27 +22,27 @@ class ListIncidentResource(Resource):
                 incidentList = Incident.query.all()
         elif(data['order'] =='Desc'):
                 incidentList = Incident.query.order_by(Incident.incidentID.desc()).all()
-
+                
         # call Schema class constructors
         incident_schema = IncidentSchema(many=True)
-        status_schema = IncidentHasStatusSchema()
         
         il = []
-        ihsl =[]
+        count = 0
         for i in incidentList:
             for s in i.statuses:
                 if(data['status'] =='Ongoing') and (s.statusName=='Ongoing'): # ongoing incident
                     if len(i.statuses) is 1  or 2: # if incident has 1 status(for opCreate) 2(for gpCreate) statuses, then it must be Ongoing
                         il.append(i)
+                        count = count+1
                 elif(data['status'] =='Pending') and (s.statusName=='Pending'): # pending incident
                     if len(i.statuses) is 1: # if incident has 1 status, then it must be pending.
                         il.append(i)
+                        count = count+1
             if (data['status'] == 'All'): # get all incident
-                statusNo = len(i.statuses) # get the latest status of each incident (for verifying purposes)
+                statusNo = len(i.statuses) # get the latest status of each incident (for verifying)
                 currentStatus = i.statuses[statusNo-1] 
                 il.append(i) 
+                count = count+1
 
-        
-        data = incident_schema.dump(il, many=True)   
-        
-        return data, 200
+        data = incident_schema.dump(il, many=True)
+        return data, count

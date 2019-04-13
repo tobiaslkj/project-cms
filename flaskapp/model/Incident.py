@@ -96,6 +96,11 @@ class IncidentHasStatusSchema(Schema):
     statusTime = fields.DateTime()
     statusID = fields.Int()
     statusName = fields.Nested(StatusSchema, only=["statusName"])
+
+class IncidentHasStatusSchema2(Schema):
+    statusTime = fields.DateTime()
+    #statusID = fields.Int()
+    statusName = fields.Str()
   
 class GeneralPublicSchema(Schema):
     gpid = fields.Int()
@@ -129,8 +134,10 @@ class IncidentSchema(Schema):
     emergencyType = fields.List(fields.Nested(EmergencyTypeSchema))
     assistanceType = fields.List(fields.Nested(assistanceTypeSchema))
     relevantAgencies = fields.List(fields.Nested(RelevantAgencySchema))
-    statuses = fields.List(fields.Nested(IncidentHasStatusSchema))
+    status = fields.List(fields.Nested(IncidentHasStatusSchema))
+    statuses = fields.List(fields.Nested(IncidentHasStatusSchema2))
 
+    
 
 class Incident(db.Model):
     __tablename__ = 'incident'
