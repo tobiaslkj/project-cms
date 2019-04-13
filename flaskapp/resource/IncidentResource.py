@@ -15,9 +15,15 @@ from pprint import pprint
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
 class IncidentResource(Resource): 
-    def get(self,incident_id):
+    def get(self,incident_id=None):
+        if incident_id is None:
+            abort(404)
         
         i = db.session.query(Incident).filter(Incident.incidentID==incident_id).first()
+
+        if(i is None):
+            return {"msg":"Incident not found"},404
+        
         incident_schema = IncidentSchema()
         
         statustime_schema = IncidentHasStatusSchema()
