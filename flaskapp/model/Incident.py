@@ -53,7 +53,7 @@ class GeneralPublic(db.Model):
     gp = db.relationship('Incident', backref='GeneralPublic', lazy=True)
     name = db.Column(db.String(40), unique=False, nullable=False)  
     userIC = db.Column(db.String(9), unique=True, nullable=False)
-    mobilePhone = db.Column(db.String(8), unique=True, nullable=False)
+    mobilePhone = db.Column(db.String(8), unique=False, nullable=False)
     
 
     def __init__(self, **kwargs):

@@ -28,14 +28,14 @@ class GPIncidentResource(Resource):
         data = parser.parse_args()
 
         #check if the gp exist in database
-        if(GeneralPublic.query.filter_by(userIC=data['userIC']).first() is None):
-            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
-            db.session.add(gp)
-            db.session.commit()
-
-        #get the gpid
+        # if gp exists, update gp information
+        # if gp information does not exist, create as new one
         gp = GeneralPublic.query.filter_by(userIC=data['userIC']).first()
-        gpid = gp.gpid
+        if(gp is None):
+            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
+        else:
+            gp.name = data['name']
+            gp.mobilePhone = data['mobilePhone']
 
         # get the full address lat, long and postalCode
         address = data['address']
@@ -53,7 +53,8 @@ class GPIncidentResource(Resource):
 
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 
-                        latitude=latitude, gpid=gpid, description=data['description'])
+                        latitude=latitude, description=data['description'])
+        incident.reportedUser = gp
         db.session.add(incident)
         db.session.commit()
 
