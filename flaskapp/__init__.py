@@ -4,7 +4,7 @@ from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 from .config import config
 from flask_jwt_extended import JWTManager
-#from flask_marshmallow import Marshmallow
+from flask_cors import CORS
 
 app = Flask(__name__,static_folder='./client', static_url_path='')
 app.config['SECRET_KEY'] = config['FLASK_APP_SECRET']
@@ -12,6 +12,7 @@ sqlURI = "mysql://"+config['DATABASE_USERNAME']+":"+config['DATABASE_PASSWORD']+
 app.config['SQLALCHEMY_DATABASE_URI'] = sqlURI
 db = SQLAlchemy(app)
 api = Api(app)
+CORS(app)
 
 # Configuration for jwt
 app.config['JWT_SECRET_KEY']=config['FLASK_APP_SECRET']

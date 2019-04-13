@@ -15,9 +15,15 @@ from pprint import pprint
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
 class IncidentResource(Resource): 
-    def get(self,incident_id):
+    def get(self,incident_id=None):
+        if incident_id is None:
+            abort(404)
         
         i = db.session.query(Incident).filter(Incident.incidentID==incident_id).first()
+
+        if(i is None):
+            return {"msg":"Incident not found"},404
+        
         incident_schema = IncidentSchema()
         
         statustime_schema = IncidentHasStatusSchema()
@@ -26,15 +32,12 @@ class IncidentResource(Resource):
             data1 = statustime_schema.dump(ihs)
             data1['statusname'] = ihs.status.statusName
             ihss.append(data1)
-            
         
         data = incident_schema.dump(i)
         data['status'] = ihss
         return data
 
     
-        
-
     @operator_required
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
@@ -48,15 +51,15 @@ class IncidentResource(Resource):
         parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
             
-        # If gp_create = False, it is operator create incident
-        # Check if a GP exist in database
-        if(GeneralPublic.query.filter_by(userIC=data['userIC']).first() is None):
-            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'])
-            db.session.add(gp)
-            db.session.commit()
-        
+               #check if the gp exist in database
+        # if gp exists, update gp information
+        # if gp information does not exist, create as new one
         gp = GeneralPublic.query.filter_by(userIC=data['userIC']).first()
-        gpid = gp.gpid
+        if(gp is None):
+            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
+        else:
+            gp.name = data['name']
+            gp.mobilePhone = data['mobilePhone']
     
         
         # get the full address lat, long and postalCode
@@ -79,7 +82,8 @@ class IncidentResource(Resource):
 
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 
-                            latitude=latitude, gpid=gpid, description=data['description'], operatorID=operatorid)
+                            latitude=latitude, description=data['description'], operatorID=operatorid)
+        incident.reportedUser = gp
         db.session.add(incident)
         db.session.commit()
 
@@ -121,19 +125,23 @@ class IncidentResource(Resource):
         return {"msg":"Incident created."},201
           
     @operator_required
-    def patch(self, incidentID=None):
-        if incidentID is None:
+    def patch(self, incident_id=None):
+        if incident_id is None:
             abort(404)
 
         parser = reqparse.RequestParser(bundle_errors=True)
+        parser.add_argument('action', help='This field cannot be blank',required=True)
         parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
+
+        if(data['action'] not in ['approve','reject']):
+            return {"msg":"Please choose a valid action"}, 400
 
         ## ensure that the array is not zerio legnth 
         if(len(data['relevant_agencies']) is 0):
             return {"error":"should not have 0 relevant agencies"},422
         
-        i = Incident.query.get(incidentID)
+        i = Incident.query.get(incident_id)
         if i is None or len(i.statuses) is not 1: # status should only have 1 length, not length of 1 means its not in pending state
             return {"msg":"Incident not found"},404
 

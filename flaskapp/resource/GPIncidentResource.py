@@ -23,19 +23,19 @@ class GPIncidentResource(Resource):
         parser.add_argument('userIC', help='userIC cannot be blank',required=True)
         parser.add_argument('mobilePhone', help='mobilePhone cannot be blank', required=True)
         parser.add_argument('description', help='description cannot be blank',required=True)
-        parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=True)
+        parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=False)
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
 
         #check if the gp exist in database
-        if(GeneralPublic.query.filter_by(userIC=data['userIC']).first() is None):
-            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
-            db.session.add(gp)
-            db.session.commit()
-
-        #get the gpid
+        # if gp exists, update gp information
+        # if gp information does not exist, create as new one
         gp = GeneralPublic.query.filter_by(userIC=data['userIC']).first()
-        gpid = gp.gpid
+        if(gp is None):
+            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
+        else:
+            gp.name = data['name']
+            gp.mobilePhone = data['mobilePhone']
 
         # get the full address lat, long and postalCode
         address = data['address']
@@ -53,15 +53,17 @@ class GPIncidentResource(Resource):
 
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 
-                        latitude=latitude, gpid=gpid, description=data['description'])
+                        latitude=latitude, description=data['description'])
+        incident.reportedUser = gp
         db.session.add(incident)
         db.session.commit()
 
         #update incident_request_assistanceType table
-        for x in data['assistance_type']:
-            aid = AssistanceType.query.filter_by(aid=x).first()
-            incident.assistanceType.append(aid)
-            db.session.add(incident)
+        if (data['assistance_type']is not None):
+            for x in data['assistance_type']:
+                aid = AssistanceType.query.filter_by(aid=x).first()
+                incident.assistanceType.append(aid)
+                db.session.add(incident)
 
         #update incident_has_emergencyType table  
         for y in data['emergency_type']:
