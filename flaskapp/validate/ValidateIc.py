@@ -1,6 +1,13 @@
+import re
+
 
 def validateNRIC(str):
         if (len(str) != 9):
+            return False
+        
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        
+        if(regex.search(str) is not None):
             return False
         
         str = str.upper()
