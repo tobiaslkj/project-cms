@@ -3,6 +3,7 @@ from flaskapp import db
 from flask import Flask, jsonify, abort
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
+from flaskapp.validate.ValidateIc import *
 from datetime import datetime
 import requests, json
 import pprint
@@ -35,6 +36,9 @@ class IncidentResource(Resource):
         
         data = incident_schema.dump(i)
         data['status'] = ihss
+        del data['statuses']
+        del data['longtitude']
+        del data['latitude']
         return data
 
     
@@ -50,8 +54,16 @@ class IncidentResource(Resource):
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
         parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
+        
+        #validating if the entered NRIC is valid or not
+        validIc = validateNRIC(data['userIC'])
+        if (validIc is False):
+            return {"msg":"Please enter a valid NRIC"}, 400
+        else:
+            validatedIc = data['userIC']
             
-               #check if the gp exist in database
+         
+        #check if the gp exist in database
         # if gp exists, update gp information
         # if gp information does not exist, create as new one
         gp = GeneralPublic.query.filter_by(userIC=data['userIC']).first()

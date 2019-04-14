@@ -139,7 +139,6 @@ class IncidentSchema(Schema):
     relevantAgencies = fields.List(fields.Nested(RelevantAgencySchema))
     status = fields.List(fields.Nested(IncidentHasStatusSchema))
     statuses = fields.List(fields.Nested(IncidentHasStatusSchema2))
-
     
 
 class Incident(db.Model):
