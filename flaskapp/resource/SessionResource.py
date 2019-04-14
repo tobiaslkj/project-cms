@@ -1,11 +1,14 @@
 from flask_restful import Resource, reqparse
 from flaskapp import db
 from flaskapp.model.User import User
-from flask_jwt_extended import jwt_required, create_access_token
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_claims
 
 class SessionResource(Resource):
+    @jwt_required
     def get(self):
-        return {'hello': 'world' }
+        user_info = get_jwt_claims()
+
+        return {'user': user_info }
 
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)

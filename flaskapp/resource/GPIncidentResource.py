@@ -3,12 +3,13 @@ from flaskapp import db
 from flask import Flask, jsonify
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
+from flaskapp.validate.ValidateIc import *
 from datetime import datetime
-import requests, json
 from flaskapp.utility.WeblinkGenerator import generateURL
 from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
 from flaskapp.utility.SMSSender import send_sms
+from flaskapp.utility.Address import getAddress
 
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
@@ -23,46 +24,48 @@ class GPIncidentResource(Resource):
         parser.add_argument('userIC', help='userIC cannot be blank',required=True)
         parser.add_argument('mobilePhone', help='mobilePhone cannot be blank', required=True)
         parser.add_argument('description', help='description cannot be blank',required=True)
-        parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=True)
+        parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=False)
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
 
+        #validating if the entered NRIC is valid or not
+        validIc = validateNRIC(data['userIC'])
+        if (validIc is False):
+            return {"msg":"Please enter a valid NRIC"}, 400
+        else:
+            validatedIc = data['userIC']
+            
         #check if the gp exist in database
-        if(GeneralPublic.query.filter_by(userIC=data['userIC']).first() is None):
-            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
-            db.session.add(gp)
-            db.session.commit()
-
-        #get the gpid
+        # if gp exists, update gp information
+        # if gp information does not exist, create as new one
         gp = GeneralPublic.query.filter_by(userIC=data['userIC']).first()
-        gpid = gp.gpid
+        if(gp is None):
+            gp = GeneralPublic(name=data['name'], userIC=data['userIC'], mobilePhone=data['mobilePhone'] )
+        else:
+            gp.name = data['name']
+            gp.mobilePhone = data['mobilePhone']
 
         # get the full address lat, long and postalCode
-        address = data['address']
-        oneMap = "https://developers.onemap.sg/commonapi/search?searchVal=%s&returnGeom=Y&getAddrDetails=Y" %(address)
-        # send get request and save as response object
-        response = requests.get(oneMap)
+        result = getAddress(data['address'])
 
-        # extract result in json format
-        result = response.json()
-        print(response.content)
-
-        latitude = result['results'][0]['LATITUDE']
-        longtitude = result['results'][0]['LONGTITUDE']
-        postalCode = result['results'][0]['POSTAL']
-        address = result['results'][0]['ADDRESS']
+        latitude = result['latitude']
+        longtitude = result['longtitude']
+        postalCode = result['postalCode']
+        address = result['address']
 
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 
-                        latitude=latitude, gpid=gpid, description=data['description'])
+                        latitude=latitude, description=data['description'])
+        incident.reportedUser = gp
         db.session.add(incident)
         db.session.commit()
 
         #update incident_request_assistanceType table
-        for x in data['assistance_type']:
-            aid = AssistanceType.query.filter_by(aid=x).first()
-            incident.assistanceType.append(aid)
-            db.session.add(incident)
+        if (data['assistance_type']is not None):
+            for x in data['assistance_type']:
+                aid = AssistanceType.query.filter_by(aid=x).first()
+                incident.assistanceType.append(aid)
+                db.session.add(incident)
 
         #update incident_has_emergencyType table  
         for y in data['emergency_type']:
