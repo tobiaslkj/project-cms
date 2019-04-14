@@ -3,6 +3,7 @@ from flaskapp import db
 from flask import Flask, jsonify
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
+from flaskapp.model.Testing import *
 from datetime import datetime
 import requests, json
 from flaskapp.utility.WeblinkGenerator import generateURL
@@ -27,6 +28,13 @@ class GPIncidentResource(Resource):
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
 
+        #validating if the entered NRIC is valid or not
+        validIc = validateNRIC(data['userIC'])
+        if (validIc is False):
+            return {"msg":"Please enter a valid NRIC"}, 400
+        else:
+            validatedIc = data['userIC']
+            
         #check if the gp exist in database
         # if gp exists, update gp information
         # if gp information does not exist, create as new one
