@@ -5,11 +5,11 @@ from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
 from flaskapp.validate.ValidateIc import *
 from datetime import datetime
-import requests, json
 from flaskapp.utility.WeblinkGenerator import generateURL
 from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
 from flaskapp.utility.SMSSender import send_sms
+from flaskapp.utility.Address import getAddress
 
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
@@ -46,18 +46,12 @@ class GPIncidentResource(Resource):
             gp.mobilePhone = data['mobilePhone']
 
         # get the full address lat, long and postalCode
-        address = data['address']
-        oneMap = "https://developers.onemap.sg/commonapi/search?searchVal=%s&returnGeom=Y&getAddrDetails=Y" %(address)
-        # send get request and save as response object
-        response = requests.get(oneMap)
+        result = getAddress(data['address'])
 
-        # extract result in json format
-        result = response.json()
-
-        latitude = result['results'][0]['LATITUDE']
-        longtitude = result['results'][0]['LONGTITUDE']
-        postalCode = result['results'][0]['POSTAL']
-        address = result['results'][0]['ADDRESS']
+        latitude = result['latitude']
+        longtitude = result['longtitude']
+        postalCode = result['postalCode']
+        address = result['address']
 
         # Create the incident instance and add to db
         incident =Incident(address=address, postalCode=postalCode, longtitude=longtitude, 

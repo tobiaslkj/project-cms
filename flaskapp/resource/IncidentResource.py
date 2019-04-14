@@ -5,13 +5,11 @@ from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
 from flaskapp.validate.ValidateIc import *
 from datetime import datetime
-import requests, json
-import pprint
 from flaskapp.utility.WeblinkGenerator import generateURL
 from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
 from flaskapp.utility.SMSSender import send_sms
-from pprint import pprint
+from flaskapp.utility.Address import getAddress
 
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
@@ -75,18 +73,12 @@ class IncidentResource(Resource):
     
         
         # get the full address lat, long and postalCode
-        address = data['address']
-        oneMap = "https://developers.onemap.sg/commonapi/search?searchVal=%s&returnGeom=Y&getAddrDetails=Y" %(address)
-        # send get request and save as response object
-        response = requests.get(oneMap)
+        result = getAddress(data['address'])
 
-        # extract result in json format
-        result = response.json()
-
-        latitude = result['results'][0]['LATITUDE']
-        longtitude = result['results'][0]['LONGTITUDE']
-        postalCode = result['results'][0]['POSTAL']
-        address = result['results'][0]['ADDRESS']
+        latitude = result['latitude']
+        longtitude = result['longtitude']
+        postalCode = result['postalCode']
+        address = result['address']
 
         #get the operator id
         operatorInfo = get_jwt_claims()
@@ -142,16 +134,47 @@ class IncidentResource(Resource):
             abort(404)
 
         parser = reqparse.RequestParser(bundle_errors=True)
-        parser.add_argument('action', help='This field cannot be blank',required=True)
-        parser.add_argument('relevant_agencies',action='append', help='This field cannot be blank',required=True)
+        parser.add_argument('action', help='This field cannot be blank')
+        parser.add_argument('address')
+        parser.add_argument('name')
+        parser.add_argument('userIC')
+        parser.add_argument('description')
+        parser.add_argument('mobilePhone')
+        parser.add_argument('assistance_type', action='append')
+        parser.add_argument('emergency_type',action='append')
+        parser.add_argument('relevant_agencies',action='append')
         data = parser.parse_args()
 
         if(data['action'] not in ['approve','reject']):
             return {"msg":"Please choose a valid action"}, 400
+        
+        if data['action'] == 'reject':
+            i = Incident.query.get(incident_id)
+            if len(i.statuses) == 1: # got more status other than pending
+                if i.statuses[0].statusID == 1:
+                    s = Status.query.get(4)
+                    i.statuses.append(s)
+                    db.session.add(i)
+                    db.session.commit()
+                    return {"msg":"Incident has been rejected"},200
 
-        ## ensure that the array is not zerio legnth 
+            return {"msg":"Unable to reject incident as it is not in pending state"}, 400
+        
+        dataMustHave = ['address','name','userIC', 'description','mobilePhone','assistance_type','emergency_type', 'relevant_agencies']
+
+        errorMessages={}
+        failFlag = 0
+        for dmh in dataMustHave:
+            if data[dmh] is None:
+                failFlag = 1
+                errorMessages[dmh]="This field is required"
+        
+        if failFlag:
+            return errorMessages,400
+            
+        ## ensure that the array is not zero legnth 
         if(len(data['relevant_agencies']) is 0):
-            return {"error":"should not have 0 relevant agencies"},422
+            return {"error":"should not have 0 relevant agencies"},400
         
         i = Incident.query.get(incident_id)
         if i is None or len(i.statuses) is not 1: # status should only have 1 length, not length of 1 means its not in pending state
@@ -161,6 +184,34 @@ class IncidentResource(Resource):
         o = Operator.query.get(operatorInfo['operatorid'])
         i.operator = o
         
+        gp = GeneralPublic.query.filter_by(userIC = data['userIC']).first()
+        if gp is None:
+            gp = GeneralPublic(userIC = data['userIC'])
+        gp.mobilePhone = data['mobilePhone']
+
+        i.reportedUser = gp
+        i.description = data['description']
+
+        result = getAddress(data['address'])
+
+        i.latitude = result['latitude']
+        i.longtitude = result['longtitude']
+        i.postalCode = result['postalCode']
+        i.address = result['address']
+
+        i.emergencyType = []
+        for y in data['emergency_type']:
+            eid = EmergencyType.query.filter_by(eid=y).first()
+            i.emergencyType.append(eid)
+            db.session.add(i)
+        
+        #update incident_request_assistanceType table
+        i.assistanceType = []
+        for x in data['assistance_type']:
+            aid = AssistanceType.query.filter_by(aid=x).first()
+            i.assistanceType.append(aid)
+            db.session.add(i)
+
         # attached relevant agencies to this incidnet
         for raid in data['relevant_agencies']:
             randomURL = generateURL()
@@ -170,8 +221,6 @@ class IncidentResource(Resource):
             iatra = IncidentAssignedToRelevantAgencies(incident=i, relevantAgency=ra, link=randomURL)
             db.session.add(iatra)
 
-        #Add the relationship of who approved the incident
-        db.session.add(i)
 
         # add a new row of incident has status
         s = Status.query.get(2) # id 2 is status pending
