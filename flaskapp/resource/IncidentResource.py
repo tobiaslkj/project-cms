@@ -3,7 +3,7 @@ from flaskapp import db
 from flask import Flask, jsonify, abort
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
-from flaskapp.model.Testing import *
+from flaskapp.validate.ValidateIc import *
 from datetime import datetime
 import requests, json
 import pprint

@@ -3,7 +3,7 @@ from flaskapp import db
 from flask import Flask, jsonify
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
-from flaskapp.model.Testing import *
+from flaskapp.validate.ValidateIc import *
 from datetime import datetime
 import requests, json
 from flaskapp.utility.WeblinkGenerator import generateURL
