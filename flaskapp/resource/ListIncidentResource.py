@@ -20,7 +20,7 @@ class ListIncidentResource(Resource):
         for s in statusDictQuery:
             statusDict[s.statusName] = s.statusID
 
-        if data['status'] not in statusDict.keys() and data['status'] != 'All':
+        if data['status'] not in statusDict.keys() and data['status'].lower() != 'All'.lower():
             return {"msg":"please input a valid status"},400
 
        # Return List of incidents 
@@ -37,7 +37,7 @@ class ListIncidentResource(Resource):
         else:
             queryObject = IncidentHasStatus.query.filter(IncidentHasStatus.statusID==statusDict[data['status']])
 
-        if data['order']=='Desc':
+        if data['order'].lower()=='Desc'.lower():
             if data['status'].lower() == "All".lower():
                 queryObject = queryObject.order_by(Incident.incidentID.desc())
             else:

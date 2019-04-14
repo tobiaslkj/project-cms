@@ -126,7 +126,7 @@ class EmergencyTypeSchema(Schema):
 
 class IncidentSchema(Schema):    
     incidentID = fields.Int()
-    postalCode = fields.Int()
+    postalCode = fields.Str()
     address = fields.Str()
     description = fields.Str()
     operatorID = fields.Int()
