@@ -36,6 +36,9 @@ class IncidentResource(Resource):
         
         data = incident_schema.dump(i)
         data['status'] = ihss
+        del data['statuses']
+        del data['longtitude']
+        del data['latitude']
         return data
 
     
