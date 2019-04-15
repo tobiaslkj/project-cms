@@ -33,9 +33,15 @@ class TestFlaskApiusingRequest(unittest.TestCase):
     
     # invalid name, other fields valid
     def test_invalid_phoneNo(self):
-        payload = {'address': '331 Tah Ching Rd', 'name': 'Yi Ern', 'userIC':'S9648878E', 'mobilePhone': '9796959', 'description': 'optional', 'assistance_type':['1'], 'emergency_type': ['1'], 'relevant_agencies':['1']}
+        payload = {'address': '331 Tah Ching Rd', 'name': 'Harrsion Wong', 'userIC':'S9648878E', 'mobilePhone': '9796959', 'description': 'optional', 'assistance_type':['1'], 'emergency_type': ['1'], 'relevant_agencies':['1']}
         response = requests.post('http://localhost:5000/gpincident', data=payload)
         self.assertEqual(400, response.status_code)
+    
+    # all valid fields
+    def test_valid_incidentFields(self):
+        payload = {'address': '331 Tah Ching Rd', 'name': 'Harrsion Wong', 'userIC':'S9648878E', 'mobilePhone': '97969594', 'description': 'optional', 'assistance_type':['1'], 'emergency_type': ['1'], 'relevant_agencies':['1']}
+        response = requests.post('http://localhost:5000/gpincident', data=payload)
+        self.assertEqual(201, response.status_code)
 
 
 if __name__ == '__main__':
