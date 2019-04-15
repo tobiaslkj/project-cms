@@ -148,7 +148,7 @@ class Incident(db.Model):
     incidentID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     postalCode = db.Column(db.String(10), unique=False, nullable=False)
     address = db.Column(db.String(200), unique=False, nullable=False)
-    description = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.String(200), nullable=True)
     
     #Will be computed based by address entered
     longtitude = db.Column(db.String(120), unique=False, nullable=False)
