@@ -10,6 +10,8 @@ from flaskapp.access_control import operator_required
 from flask_jwt_extended import get_jwt_claims
 from flaskapp.utility.SMSSender import send_sms
 from flaskapp.utility.Address import getAddress
+from flaskapp.utility.Template import *
+from flaskapp.utility.SocialMedia import postToSocialMedia
 
 #Operator create incident from user call in, status = "Ongoing"
 #GP create incident set gp_create = True, has no status
@@ -124,7 +126,42 @@ class IncidentResource(Resource):
         status = IncidentHasStatus(statusID=statusID,incidentID=incident.incidentID)
         db.session.add(status)
         db.session.commit()
-
+        
+        #if the incident submited is very serious: Earthquake, Terrorist, then send twitter & FB
+        # EarthquakeID=3, TerroristID=6
+        seriousType = ['3','6']
+        enteredType = data['emergency_type']
+    
+        set1 = set(seriousType)
+        set2 = set(enteredType)
+        
+        intersect = bool(set2.intersection(set1))
+        if (intersect is True):
+            if '3' in enteredType and '6' not in enteredType:
+                # call template for earthquake
+                # call fb and twitter api
+                message1 = one_emergency_facebook_template.format('Earthquake',data['address'])
+                postToSocialMedia(message1,2)
+                message2 = one_emergency_twitter_template.format('Earthquake',data['address'])
+                postToSocialMedia(message2,1)
+                
+            
+            elif '6' in enteredType and '3' not in enteredType:
+                # call template for terrorist
+                # call fb and twitter api
+                message1 = one_emergency_facebook_template.format('Terrorist Attack',data['address'])
+                postToSocialMedia(message1,2)
+                message2 = one_emergency_twitter_template.format('Terrorist Attack',data['address'])
+                postToSocialMedia(message2,1)
+            
+            elif '3' in enteredType and '6' in enteredType: 
+                # call template for terrorist and earthquake
+                # call fb and twitter api
+                message1 = two_emergency_facebook_template.format('Earthquake','Terrorist Attack', data['address'])
+                postToSocialMedia(message1,2)
+                message2 = two_emergency_twitter_template.format('Earthquake','Terrorist Attack', data['address'])
+                postToSocialMedia(message2,1)
+            
 
         return {"msg":"Incident created."},201
           
@@ -188,6 +225,7 @@ class IncidentResource(Resource):
         if gp is None:
             gp = GeneralPublic(userIC = data['userIC'])
         gp.mobilePhone = data['mobilePhone']
+        gp.name = data['name']
 
         i.reportedUser = gp
         i.description = data['description']
@@ -227,6 +265,40 @@ class IncidentResource(Resource):
         ihs = IncidentHasStatus(incident = i, status = s)
         db.session.add(ihs)
         db.session.commit()
+        
+        #post to socialmedia if is terrorist(6) or earthquake(3)
+        seriousType = ['3','6']
+        enteredType = data['emergency_type']
+    
+        set1 = set(seriousType)
+        set2 = set(enteredType)
+        intersect = bool(set2.intersection(set1))
+        if (intersect is True):
+            if '3' in enteredType and '6' not in enteredType:
+                # call template for earthquake
+                # call fb and twitter api
+                message1 = one_emergency_facebook_template.format('Earthquake',data['address'])
+                postToSocialMedia(message1,2)
+                message2 = one_emergency_twitter_template.format('Earthquake',data['address'])
+                postToSocialMedia(message2,1)
+                
+            
+            elif '6' in enteredType and '3' not in enteredType:
+                # call template for terrorist
+                # call fb and twitter api
+                message1 = one_emergency_facebook_template.format('Terrorist Attack',data['address'])
+                postToSocialMedia(message1,2)
+                message2 = one_emergency_twitter_template.format('Terrorist Attack',data['address'])
+                postToSocialMedia(message2,1)
+            
+            elif '3' in enteredType and '6' in enteredType: 
+                # call template for terrorist and earthquake
+                # call fb and twitter api
+                message1 = two_emergency_facebook_template.format('Earthquake','Terrorist Attack', data['address'])
+                postToSocialMedia(message1,2)
+                message2 = two_emergency_twitter_template.format('Earthquake','Terrorist Attack', data['address'])
+                postToSocialMedia(message2,1)
+            
         
         return {"msg":"Incident status has been approved"},201
 
