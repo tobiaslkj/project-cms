@@ -31,7 +31,7 @@ class TestFlaskApiusingRequest(unittest.TestCase):
         response = requests.post('http://localhost:5000/gpincident', data=payload)
         self.assertEqual(400, response.status_code)
     
-    # invalid name, other fields valid
+    # invalid phoneNo, other fields valid
     def test_invalid_phoneNo(self):
         payload = {'address': '331 Tah Ching Rd', 'name': 'Harrsion Wong', 'userIC':'S9648878E', 'mobilePhone': '9796959', 'description': 'optional', 'assistance_type':['1'], 'emergency_type': ['1'], 'relevant_agencies':['1']}
         response = requests.post('http://localhost:5000/gpincident', data=payload)
