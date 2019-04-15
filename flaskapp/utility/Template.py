@@ -8,8 +8,9 @@ There is a {} at {}.
 Stay calm down and please proceed to the nearest shelter.
 If need any additional assistance, please proceed to the nearest police station.
 
+Posted now:{}
 
-Crisis Management System - Team 8scomplement        
+Crisis Management System - Team 8scomplements       
 Note: This is an automatically generated message.
         
 '''
@@ -21,7 +22,8 @@ To the public,
 There is a {} at {}.
 Stay calm and proceed to the nearest shelter or police station.
 
-Crisis Management System - Team 8scomplement        
+Posted now:{}
+      
 Note: This is an automatically generated message.
 
         
@@ -36,8 +38,9 @@ There is a {},{} at {}.
 Stay calm down and please proceed to the nearest shelter.
 If need any additional assistance, please proceed to the nearest police station.
 
+Posted now:{}
 
-Crisis Management System - Team 8scomplement        
+Crisis Management System - Team 8scomplements       
 Note: This is an automatically generated message.
 
 '''
@@ -49,7 +52,9 @@ To the public,
 There is a {},{} at {}.
 Stay calm and proceed to the nearest shelter or police station.
 
-Crisis Management System - Team 8scomplement        
+Posted now:{}
+
+      
 Note: This is an automatically generated message.
 
         
