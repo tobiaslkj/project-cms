@@ -25,7 +25,11 @@ CORS(app)
 # Configuration for jwt
 app.config['JWT_SECRET_KEY']=config['FLASK_APP_SECRET']
 app.config['JWT_ACCESS_TOKEN_EXPIRES']=86400
-jwt = JWTManager(app)   
+jwt = JWTManager(app)
+
+# Register scheudling process
+from flaskapp.utility.EmailScheduler import EmailScheduler
+emailScheduler = EmailScheduler()
 
 #ma = Marshmallow(app)
 from flaskapp import routes
