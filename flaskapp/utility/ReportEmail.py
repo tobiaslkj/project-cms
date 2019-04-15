@@ -1,19 +1,29 @@
 from flask import Flask
 from flask_restful import Resource, reqparse
-from flaskapp import db
+# from flaskapp import db
 from flaskapp.utility.EmailSender import send_email
 from flaskapp.model.Incident import *
 from datetime import datetime
+from sqlalchemy import func
 
 
 def findReportContent():
-    resolved = Status.query.filter_by(statusName='Resolved').first()
-    resolvedID = resolved.statusID
-    numresolvedIncidents = Incident.query.filter_by(statuses=resolvedID).count()
+    # ongoing statusID = 2, resolved statusID = 3
+    # search only the incident table, find the statuses see if ==2/3 
+    # create an ongoing and resolved list, add in the fulfilled incident
+    totIncidents = Incident.query.all()
+    resolvedIncident = []
+    ongoingIncident =[] 
     
-    ongoing = Status.query.filter_by(statusName='Ongoing').first()
-    ongoingID = ongoing.statusID
-    numongoingIncidents = Incident.query.filter_by(statuses=ongoingID).count()
+    for i in totIncidents:
+        if i.statuses[len(i.statuses)-1].statusID==3:
+            resolvedIncident.append(i)
+        elif i.statuses[len(i.statuses)-1].statusID==2:
+            ongoingIncident.append(i)
+   
+    numOfOngoingIncident = len(ongoingIncident)
+    numOfResolvedIncident = len(resolvedIncident)
+  
+    return {"numOfResolvedIncident":numOfResolvedIncident, "numOfOngoingIncident":numOfOngoingIncident}
     
-    return {"numOfResolvedIncident":numresolvedIncidents, "numOfOngoingIncident":numongoingIncidents}
     
