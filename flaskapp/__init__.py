@@ -6,6 +6,14 @@ from .config import config
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
+from flaskapp.utility.ReportEmail import *
+from flask_mail import Mail, Message
+import time
+import atexit
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+#print("========================================================================================================")
 app = Flask(__name__,static_folder='./client', static_url_path='')
 app.config['SECRET_KEY'] = config['FLASK_APP_SECRET']
 sqlURI = "mysql://"+config['DATABASE_USERNAME']+":"+config['DATABASE_PASSWORD']+"@"+config['DATABASE_HOST']+"/"+config['DATABASE_NAME']
@@ -33,3 +41,39 @@ def jwt_extend_identity_override(user):
 @app.route('/<path:path>')
 def serve_page(path):
     return send_from_directory('client', path)
+
+
+#app = Flask(__name__)
+
+app.config.update(
+    DEBUG = True,
+    #EMAIL SETTINGS
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 465,
+    MAIL_USE_SSL = True,
+    MAIL_USERNAME = "8scomplements@gmail.com",
+    MAIL_PASSWORD = "trutrutru"
+)
+
+mail = Mail(app)
+
+resultDict = findReportContent()
+message = "Currently, there are {} incidents resolved and {} incidents still ongoing".format(\
+            resultDict.get("numOfResolvedIncident"), resultDict.get("numOfOngoingIncident"))
+send_email(message)
+
+def send_email(message):
+    msg = Message(
+        message,
+        sender = 'chuabck@gmail.com',
+        recipients = ['wanglu1995.wl@gmail.com'])
+    msg.body = "This is the email body testtesttest"
+    mail.send(msg)
+    return "Sent"
+
+sched = BackgroundScheduler(daemon=True)
+sched.add_job(send_email, trigger='interval', seconds=5)
+sched.start()
+
+if __name__ == "__main__":
+    app.run(debug=True)
