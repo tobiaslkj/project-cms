@@ -140,26 +140,26 @@ class IncidentResource(Resource):
             if '3' in enteredType and '6' not in enteredType:
                 # call template for earthquake
                 # call fb and twitter api
-                message1 = one_emergency_facebook_template.format('Earthquake',data['address'])
+                message1 = one_emergency_facebook_template.format('Earthquake',data['address'],str(datetime.now()))
                 postToSocialMedia(message1,2)
-                message2 = one_emergency_twitter_template.format('Earthquake',data['address'])
+                message2 = one_emergency_twitter_template.format('Earthquake',data['address'],str(datetime.now()))
                 postToSocialMedia(message2,1)
                 
             
             elif '6' in enteredType and '3' not in enteredType:
                 # call template for terrorist
                 # call fb and twitter api
-                message1 = one_emergency_facebook_template.format('Terrorist Attack',data['address'])
+                message1 = one_emergency_facebook_template.format('Terrorist Attack',data['address'],str(datetime.now()))
                 postToSocialMedia(message1,2)
-                message2 = one_emergency_twitter_template.format('Terrorist Attack',data['address'])
+                message2 = one_emergency_twitter_template.format('Terrorist Attack',data['address'],str(datetime.now()))
                 postToSocialMedia(message2,1)
             
             elif '3' in enteredType and '6' in enteredType: 
                 # call template for terrorist and earthquake
                 # call fb and twitter api
-                message1 = two_emergency_facebook_template.format('Earthquake','Terrorist Attack', data['address'])
+                message1 = two_emergency_facebook_template.format('Earthquake','Terrorist Attack', data['address'],str(datetime.now()))
                 postToSocialMedia(message1,2)
-                message2 = two_emergency_twitter_template.format('Earthquake','Terrorist Attack', data['address'])
+                message2 = two_emergency_twitter_template.format('Earthquake','Terrorist Attack', data['address'],str(datetime.now()))
                 postToSocialMedia(message2,1)
             
 
@@ -277,26 +277,26 @@ class IncidentResource(Resource):
             if '3' in enteredType and '6' not in enteredType:
                 # call template for earthquake
                 # call fb and twitter api
-                message1 = one_emergency_facebook_template.format('Earthquake',data['address'])
+                message1 = one_emergency_facebook_template.format('Earthquake',data['address'],str(datetime.now()))
                 postToSocialMedia(message1,2)
-                message2 = one_emergency_twitter_template.format('Earthquake',data['address'])
+                message2 = one_emergency_twitter_template.format('Earthquake',data['address'],str(datetime.now()))
                 postToSocialMedia(message2,1)
                 
             
             elif '6' in enteredType and '3' not in enteredType:
                 # call template for terrorist
                 # call fb and twitter api
-                message1 = one_emergency_facebook_template.format('Terrorist Attack',data['address'])
+                message1 = one_emergency_facebook_template.format('Terrorist Attack',data['address'],str(datetime.now()))
                 postToSocialMedia(message1,2)
-                message2 = one_emergency_twitter_template.format('Terrorist Attack',data['address'])
+                message2 = one_emergency_twitter_template.format('Terrorist Attack',data['address'],str(datetime.now()))
                 postToSocialMedia(message2,1)
             
             elif '3' in enteredType and '6' in enteredType: 
                 # call template for terrorist and earthquake
                 # call fb and twitter api
-                message1 = two_emergency_facebook_template.format('Earthquake','Terrorist Attack', data['address'])
+                message1 = two_emergency_facebook_template.format('Earthquake','Terrorist Attack', data['address'],str(datetime.now()))
                 postToSocialMedia(message1,2)
-                message2 = two_emergency_twitter_template.format('Earthquake','Terrorist Attack', data['address'])
+                message2 = two_emergency_twitter_template.format('Earthquake','Terrorist Attack', data['address'],str(datetime.now()))
                 postToSocialMedia(message2,1)
             
         
