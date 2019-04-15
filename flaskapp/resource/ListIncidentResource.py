@@ -25,7 +25,7 @@ class ListIncidentResource(Resource):
             if x.lower() not in statusDict.keys():
                 return {"msg":f"{x} is not a valid status"},400
             else:
-                statusQuery.append(statusDict[x])
+                statusQuery.append(statusDict[x.lower()])
 
                 
         # call Schema class constructors
