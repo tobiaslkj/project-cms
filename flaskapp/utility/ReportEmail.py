@@ -16,7 +16,9 @@ def findReportContent():
     ongoingIncident =[] 
     
     for i in totIncidents:
-        if i.statuses[len(i.statuses)-1].statusID==3:
+        if len(i.statuses)==0:
+            continue
+        elif i.statuses[len(i.statuses)-1].statusID==3:
             resolvedIncident.append(i)
         elif i.statuses[len(i.statuses)-1].statusID==2:
             ongoingIncident.append(i)
