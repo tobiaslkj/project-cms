@@ -37,7 +37,7 @@ class TwitterPlatform(SocialMediaPlatform):
 
 class FacebookPlatform(SocialMediaPlatform):
     def __init__(self, *args, **kwargs):
-        self.token = {"EAAeh4hKwY8EBAMZC4In0n17T2ZB9ZB2KQtUEoTNmgZC3i2ZAGlwYUS6CTSBTGRgtoWk01zbh3ZB0PEyfn5RvwfnCPRmWhSZBpsXIxtMf6Hk6Wk4hhAEuZAMBt57bw9nqtiXPTV11RI4xnvEYePQuynySZC8zRP1PlF97iYZCNMzYjX5QrU6tdAZCsettqcQnXZBwW72LbqpJQafGFK2UWaXslv51"}
+        self.token = {"EAAeh4hKwY8EBAMZBwuAqQINpe6Vi9opQJUYUEGe4wt5QSigO96AkoTAFjzSMKVkrbyIeZCe4PgrHhn1Oh7hZCUtPIeX50ziVZCFfUdqn1fyx9q9wvIZCRsDf1Y206LCRSBtkD2bZBZCKePip18c9u64ZB6UAY6vBVnTfLZC9HQNfseACnrs2YzZBtTSmV6Dj41G9EZD"}
         self.graph = facebook.GraphAPI(self.token)
         return super().__init__(*args, **kwargs)
 
