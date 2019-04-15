@@ -23,7 +23,7 @@ def getDengue():
             item['properties'][k.text.strip()] = v.text.strip()
         
         # if harrison want description, remove proceeding line
-        del item['properties']['Description']
+        # del item['properties']['Description']
 
     return json_object['features']
 
