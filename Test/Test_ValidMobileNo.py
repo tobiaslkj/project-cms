@@ -14,6 +14,7 @@ class TestValidMobileNo(unittest.TestCase):
         self.no2=validateMobileNo('836927988')
         self.no3=validateMobileNo('B3682798')
         self.no4=validateMobileNo('83682798')
+        self.no5=validateMobileNo('80@77838')
     
     def tearDown(self):
         pass
@@ -24,8 +25,9 @@ class TestValidMobileNo(unittest.TestCase):
 
     def test_not_exist_mobileno(self):
         self.assertFalse(self.no3)
+        self.assertFalse(self.no5)
 
-    def test_valid_ic(self):
+    def test_valid_mobileno(self):
         self.assertTrue(self.no4)
 
 if __name__ == '__main__':

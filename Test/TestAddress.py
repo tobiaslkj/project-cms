@@ -31,7 +31,7 @@ class Test(unittest.TestCase):
         self.assertFalse(self.address6)
         self.assertFalse(self.address7)
 
-    def test_invalid_address_spaces(self):
+    def test_invalid_address_whiteSpaces(self):
         self.assertFalse(self.address3)
        
     def test_valid_address(self):

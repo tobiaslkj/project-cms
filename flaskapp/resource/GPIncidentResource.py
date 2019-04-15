@@ -4,6 +4,9 @@ from flask import Flask, jsonify
 from flaskapp.model.Incident import *
 from flaskapp.model.Operator import *
 from flaskapp.validate.ValidateIc import *
+from flaskapp.validate.validateName import *
+from flaskapp.validate.validateAddress import *
+from flaskapp.validate.ValidateMobileNo import *
 from datetime import datetime
 import requests, json
 from flaskapp.utility.WeblinkGenerator import generateURL
@@ -30,11 +33,31 @@ class GPIncidentResource(Resource):
 
         #validating if the entered NRIC is valid or not
         validIc = validateNRIC(data['userIC'])
+        validName = validateIncidentName(data['name'])
+        validAddress = validateIncidentAddress(data['address'])
+        validMobile = validateMobileNo(data['mobilePhone'])
+
         if (validIc is False):
             return {"msg":"Please enter a valid NRIC"}, 400
         else:
             validatedIc = data['userIC']
-            
+       
+        if (validName is False):
+            return {"msg":"Please enter a valid Name"}, 400
+        else:
+            validatedName = data['name']
+
+        if (validAddress is False):
+            return {"msg": "Please enter a valid address"}, 400
+        else:
+            validatedAddress = data['address']
+
+        if (validMobile is False):
+            return {"msg": "Please enter a valid Mobile"}, 400
+        else:
+            validatedMobile = data['mobilePhone']
+
+
         #check if the gp exist in database
         # if gp exists, update gp information
         # if gp information does not exist, create as new one
