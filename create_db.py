@@ -37,7 +37,7 @@ db.session.add(assistanceType2)
 db.session.add(assistanceType3)
 db.session.add(assistanceType4)
 
-relevantAgencies1 = RelevantAgency(agencyid=1, agencyName="Singapore Civil Defence Force", agencyNumber=83682798)
+relevantAgencies1 = RelevantAgency(agencyid=1, agencyName="SCDF", agencyNumber=83682798)
 relevantAgencies2 = RelevantAgency(agencyid=2, agencyName="SPF", agencyNumber=83669795)
 relevantAgencies3 = RelevantAgency(agencyid=3, agencyName="Singapore Power", agencyNumber=93289155)
 db.session.add(relevantAgencies1)
