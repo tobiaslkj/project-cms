@@ -7,4 +7,4 @@ class DengueResource(Resource):
     def get(self):
         data = getDengue()
         meta = getDengueMeta()
-        return {"features":data, "meta": getDengueMeta()}
+        return {"features":data}

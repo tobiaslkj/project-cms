@@ -1,6 +1,6 @@
 from flask_restful import Resource, reqparse    
 from flaskapp import db
-from flaskapp.model.Incident import IncidentAssignedToRelevantAgencies, Incident, IncidentSchema, IncidentHasStatusSchema, Status
+from flaskapp.model.Incident import IncidentAssignedToRelevantAgencies, Incident, IncidentSchema, IncidentHasStatusSchema, Status, RelevantAgencySchema
 from flask_jwt_extended import jwt_required, create_access_token
 from pprint import pprint
 from flask import jsonify, abort
@@ -24,7 +24,24 @@ class IncidentUpdateResource(Resource):
             ihss.append(data1)
         
         data = incidentSchema.dump(iatra.incident)
-        data['status'] = ihss
+        del data['relevantAgencies']
+
+        rar = iatra.incident.incident_assigned_to_relevant_agencies
+        newRelevantAgencies=[]
+        for ra in rar:
+            newRa = {}
+            newRa['relevantagency_id']=ra.relevantAgency.agencyid
+            newRa['relevantagency_name']=ra.relevantAgency.agencyName
+            newRa['acknowledged_at'] = None if ra.ackTimeStamp is None else ra.ackTimeStam
+            newRa['acknowledged'] = False if ra.ackTimeStamp is None else True
+            newRelevantAgencies.append(newRa)
+        
+        data['relevantAgencies'] = newRelevantAgencies
+
+        del data['statuses']
+        data['statuses'] = ihss
+        raSchema = RelevantAgencySchema()
+        data['current_relevant_agency']=raSchema.dump(iatra.relevantAgency)
 
         return data
 
