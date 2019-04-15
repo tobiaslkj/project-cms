@@ -32,7 +32,7 @@ class IncidentUpdateResource(Resource):
             newRa = {}
             newRa['relevantagency_id']=ra.relevantAgency.agencyid
             newRa['relevantagency_name']=ra.relevantAgency.agencyName
-            newRa['acknowledged_at'] = None if ra.ackTimeStamp is None else ra.ackTimeStamp
+            newRa['acknowledged_at'] = None if ra.ackTimeStamp is None else str(ra.ackTimeStamp)
             newRa['acknowledged'] = False if ra.ackTimeStamp is None else True
             newRelevantAgencies.append(newRa)
         
