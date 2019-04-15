@@ -26,7 +26,7 @@ class GPIncidentResource(Resource):
         parser.add_argument('name', help='name cannot be blank',required=True)
         parser.add_argument('userIC', help='userIC cannot be blank',required=True)
         parser.add_argument('mobilePhone', help='mobilePhone cannot be blank', required=True)
-        parser.add_argument('description', help='description cannot be blank',required=True)
+        parser.add_argument('description', help='description cannot be blank',required=False)
         parser.add_argument('assistance_type', action='append', help='This field cannot be blank', required=False)
         parser.add_argument('emergency_type',action='append', help='This field cannot be blank',required=True)
         data = parser.parse_args()
