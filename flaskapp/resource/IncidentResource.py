@@ -111,7 +111,7 @@ class IncidentResource(Resource):
             randomURL = generateURL()
             agencyid = RelevantAgency.query.filter_by(agencyid=z).first()
             number = f'+65 {agencyid.agencyNumber}' 
-            send_sms(number, f'http://tobiaslkj.com/{randomURL}')
+            send_sms(number, f'http://ec2-54-254-185-54.ap-southeast-1.compute.amazonaws.com/ra/{randomURL}')
             assignment = IncidentAssignedToRelevantAgencies(incident=incident, relevantAgency=agencyid, link=randomURL)
             db.session.add(assignment)
         
@@ -255,7 +255,7 @@ class IncidentResource(Resource):
             randomURL = generateURL()
             ra = RelevantAgency.query.get(raid)
             number = f'+65 {ra.agencyNumber}' 
-            send_sms(number, f'http://tobiaslkj.com/{randomURL}')
+            send_sms(number, f'http://ec2-54-254-185-54.ap-southeast-1.compute.amazonaws.com/ra/{randomURL}')
             iatra = IncidentAssignedToRelevantAgencies(incident=i, relevantAgency=ra, link=randomURL)
             db.session.add(iatra)
 
