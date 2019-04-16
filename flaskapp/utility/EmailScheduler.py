@@ -6,7 +6,7 @@ class EmailScheduler():
     # Register scheudling process
         def __init__(self):
             EmailScheduler.scheduler = BackgroundScheduler()
-            EmailScheduler.scheduler.add_job(func=EmailScheduler.task, trigger="interval", minutes=30)
+            EmailScheduler.scheduler.add_job(func=EmailScheduler.task, trigger="interval", minutes=5)
             print("Job registered and started")
             EmailScheduler.scheduler.start()
             atexit.register(EmailScheduler.shutdownTask)
